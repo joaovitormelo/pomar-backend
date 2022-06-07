@@ -1,0 +1,33 @@
+{
+  "name": "pomar-backend",
+  "version": "1.0.0",
+  "description": "Backend for both Pomar's App and Website",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaovitormelo/pomar-backend.git"
+  },
+  "keywords": [
+    "pomar",
+    "backend"
+  ],
+  "author": "João Vitor De Melo Machado",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaovitormelo/pomar-backend/issues"
+  },
+  "homepage": "https://github.com/joaovitormelo/pomar-backend#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "mysql": "^2.18.1"
+  }
+}
