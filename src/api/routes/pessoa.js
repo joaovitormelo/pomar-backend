@@ -7,13 +7,8 @@ module.exports = (server) => {
     const router = express.Router();
 
     router.get('/pessoa', (req, res) => {
-        connection.query('SELECT * FROM pessoa', (error, results, fields) => {
-            if (error) {
-                res.json(error);
-            } else res.json(results);
-        });
+        res.json('ACCESSING PEOPLE ROUTE');
     });
-
     
     server.use('/', router);
 }
