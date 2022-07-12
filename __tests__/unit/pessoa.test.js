@@ -1,6 +1,6 @@
 describe("Pessoa CRUD Test", () => {
   it("should print Hi", () => {
-    const a = "Calaboca já morreu";
+    const a = "Minimal change";
     expect(a).toMatch(/calaa/gi);
   });
 });
