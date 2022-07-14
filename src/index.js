@@ -6,6 +6,7 @@ const fs = require("fs");
 
 if (fs.existsSync(".env")) {
   console.log("RUNNING FROM .ENV");
+  require("dotenv-safe").config();
 } else {
   console.log("RUNNING FROM DEV FALLBACK");
   process.env.COOKIESECRET = "cookieSecretDev";
