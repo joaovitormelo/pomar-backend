@@ -861,7 +861,7 @@
   "resolved" "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.13.1.tgz"
   "version" "1.13.1"
 
-"body-parser@1.20.0":
+"body-parser@^1.20.0", "body-parser@1.20.0":
   "integrity" "sha512-DfJ+q6EPcGKZD1QWUjSpqp+Q7bDQTsQIF4zfUAtZ6qk+H/3/QRhg9CEp39ss+/T2vw0+HaidC0ecJj/DRLIaKg=="
   "resolved" "https://registry.npmjs.org/body-parser/-/body-parser-1.20.0.tgz"
   "version" "1.20.0"
@@ -1359,18 +1359,6 @@
   "version" "4.2.1"
   dependencies:
     "is-obj" "^1.0.0"
-
-"dotenv-safe@^8.2.0":
-  "integrity" "sha512-uWwWWdUQkSs5a3mySDB22UtNwyEYi0JtEQu+vDzIqr9OjbDdC2Ip13PnSpi/fctqlYmzkxCeabiyCAOROuAIaA=="
-  "resolved" "https://registry.npmjs.org/dotenv-safe/-/dotenv-safe-8.2.0.tgz"
-  "version" "8.2.0"
-  dependencies:
-    "dotenv" "^8.2.0"
-
-"dotenv@^8.2.0":
-  "integrity" "sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g=="
-  "resolved" "https://registry.npmjs.org/dotenv/-/dotenv-8.6.0.tgz"
-  "version" "8.6.0"
 
 "duplexer3@^0.1.4":
   "integrity" "sha512-CEj8FwwNA4cVH2uFCoHUrmojhYh1vmCdOaneKJXwkeY1i9jnlslVo9dx+hQ5Hl9GnH/Bwy/IjxAyOePyPKYnzA=="
