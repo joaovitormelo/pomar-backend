@@ -26,3 +26,14 @@ jobs:
 
       - name: Run test
         run: npm test
+  
+  deploy:
+    name: Deploy on Glitch
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Use Glitch
+        uses: kanadgupta/glitch-sync@main
+        with:
+          project-id: '${{ secrets.projectId }}'
+          auth-token: '${{ secrets.authToken }}'
