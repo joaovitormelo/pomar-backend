@@ -11,8 +11,8 @@ on:
 
 #Comment
 jobs:
-  build:
-    name: Build Node.js
+  test:
+    name: Test after Build Node.js
     runs-on: ubuntu-latest
 
     steps:
@@ -26,15 +26,15 @@ jobs:
 
       - name: Run test
         run: npm test
-  
+
   deploy:
     name: Deploy on Glitch
     runs-on: ubuntu-latest
     needs: [build]
-    
+
     steps:
       - name: Use Glitch
         uses: kanadgupta/glitch-sync@main
         with:
-          project-id: '${{ secrets.projectId }}'
-          auth-token: '${{ secrets.authToken }}'
+          project-id: "${{ secrets.projectId }}"
+          auth-token: "${{ secrets.authToken }}"
