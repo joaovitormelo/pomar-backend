@@ -2,18 +2,11 @@
 
 process.env.TZ = "UTC";
 
-const fs = require("fs");
-
-if (fs.existsSync(".env")) {
-  console.log("RUNNING FROM .ENV");
-} else {
-  console.log("RUNNING FROM DEV FALLBACK");
-  process.env.COOKIESECRET = "cookieSecretDev";
-  process.env.JWTSECRET = "jwtSecretDev";
-}
+require("dotenv").config();
 
 const { port } = require("./config/globals");
-const { server, serverInstance } = require("./config/server"); //serverInstance é para chat, se for usar dps
+const { server, serverInstance } = require("./config/server");
+//serverInstance é para chat, se for usar dps
 const dbConnection = require("./config/database")();
 
 //Route Pessoa
