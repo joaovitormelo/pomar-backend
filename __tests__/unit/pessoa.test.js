@@ -1,6 +1,6 @@
 describe("Pessoa CRUD Test", () => {
   it("should print Hi", () => {
-    const a = "calaaA";
+    const a = "calaa";
     expect(a).toMatch(/calaa/gi);
   });
 });
