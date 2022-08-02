@@ -1,6 +1,6 @@
 "use strict";
 
-const { corsAllow, port } = require("./globals");
+const corsAllow = ["http://127.0.0.1:8080", "http://localhost:8080"];
 
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
@@ -21,6 +21,6 @@ server.use(cors(corsOptions));
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 
-const serverInstance = server.listen(port, () => {});
+const serverInstance = server.listen(process.env.PORT, () => {});
 
 module.exports = { server, serverInstance };

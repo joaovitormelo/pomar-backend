@@ -2,7 +2,7 @@
   "name": "pomar-backend",
   "version": "1.0.0",
   "description": "Backend for both Pomar's App and Website",
-  "main": "./src/index.js",
+  "main": "./src/main/index.js",
   "scripts": {
     "start": "node ./src/index",
     "lint": "lint-staged",
