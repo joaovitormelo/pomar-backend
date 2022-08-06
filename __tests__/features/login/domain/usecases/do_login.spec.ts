@@ -3,66 +3,132 @@ import { LoginRepositoryContract } from "../../../../../src/features/login/domai
 import DoLogin, {
   LoginParams,
 } from "../../../../../src/features/login/domain/usecases/do_login";
-import { On, method } from "ts-auto-mock/extension";
-import { createMock } from "ts-auto-mock";
 import {
-  InvalidValue,
-  UserNotFound,
+  AuthenticationError,
+  ConnectionError,
+  InvalidValueError,
+  UserNotFoundError,
 } from "../../../../../src/core/errors/errors";
 import { ValidatorContract } from "../../../../../src/core/utils/validator_contract";
+import { EncrypterContract } from "../../../../../src/core/utils/encrypter_contract";
+import { TokenGeneratorContract } from "../../../../../src/features/login/utils/TokenGenerator";
+import { Session } from "../../../../../src/features/login/domain/entities/session";
+import { Timer } from "../../../../../src/features/login/utils/Timer";
+
+class MockLoginRepository implements LoginRepositoryContract {
+  getUserForLogin: jest.Mock = jest.fn();
+  saveSession: jest.Mock = jest.fn();
+}
+
+class MockValidator implements ValidatorContract {
+  validateEmail: jest.Mock = jest.fn();
+  validatePassword: jest.Mock = jest.fn();
+}
+
+class MockEncrypter implements EncrypterContract {
+  encryptPassword: jest.Mock = jest.fn();
+}
+
+class MockTokenGenerator implements TokenGeneratorContract {
+  generateJWTToken: jest.Mock = jest.fn();
+}
+
+class MockTimer implements Timer {
+  getTimeNow: jest.Mock = jest.fn();
+}
 
 describe("Test DoLogin Use Case", () => {
-  var tEmail;
-  var tPassword;
-  var tLoginParams;
-  var tUser;
+  var tEmail: string;
+  var tPassword: string;
+  var tPasswordHash: string;
+  var tLoginParams: LoginParams;
+  var tUser: User;
+  var tJWTToken: string;
+  var tTimeNow: string;
+  var tSession: Session;
   var doLogin: DoLogin;
-  var mockLoginRepository;
-  var mockGetUserForLogin: jest.Mock;
-  var mockValidator;
-  var mockValidatePassword: jest.Mock;
+  var mockLoginRepository: MockLoginRepository;
+  var mockValidator: MockValidator;
+  var mockEncrypter: MockEncrypter;
+  var mockTokenGenerator: MockTokenGenerator;
+  var mockTimer: MockTimer;
 
   beforeEach(() => {
     //Mock values
-    tEmail = "e@mail.com";
+    tEmail = "valid@email.com";
     tPassword = "password";
+    tPasswordHash = "password_hash";
     tLoginParams = new LoginParams(tEmail, tPassword);
-    tUser = new User(1, "password_hash", 0);
+    tUser = new User(1, 1, tPasswordHash, 0);
+    tJWTToken = "valid_token";
+    tTimeNow = "06/08/2022 17:20";
+    tSession = new Session(tUser.idUser, tJWTToken, tTimeNow);
     //Mock Repository
-    mockLoginRepository = createMock<LoginRepositoryContract>();
-    mockGetUserForLogin = On(mockLoginRepository).get(
-      (mockLoginRepository) => mockLoginRepository.getUserForLogin
-    );
-    mockGetUserForLogin.mockResolvedValue(tUser);
+    mockLoginRepository = new MockLoginRepository();
+    mockLoginRepository.getUserForLogin.mockResolvedValue(tUser);
     //Mock Validator
-    mockValidator = createMock<ValidatorContract>();
-    mockValidatePassword = On(mockValidator).get(
-      (mockValidator) => mockValidator.validatePassword
-    );
-    mockValidatePassword.mockResolvedValue(true);
+    mockValidator = new MockValidator();
+    mockValidator.validatePassword.mockResolvedValue(true);
+    mockValidator.validateEmail.mockResolvedValue(true);
+    //Mock Encrypter
+    mockEncrypter = new MockEncrypter();
+    mockEncrypter.encryptPassword.mockReturnValue(tPasswordHash);
+    //Mock TokenGenerator
+    mockTokenGenerator = new MockTokenGenerator();
+    mockTokenGenerator.generateJWTToken.mockReturnValue(tJWTToken);
+    //Mock TokenGenerator
+    mockTimer = new MockTimer();
+    mockTimer.getTimeNow.mockReturnValue(tTimeNow);
     //Create sut
-    doLogin = new DoLogin(mockLoginRepository, mockValidator);
+    doLogin = new DoLogin(
+      mockLoginRepository,
+      mockValidator,
+      mockEncrypter,
+      mockTokenGenerator,
+      mockTimer
+    );
   });
 
   describe("Validation", () => {
-    it("should call validatePassword from Validator with correct parameters", () => {});
+    it("should call validatePassword from Validator with correct parameters", async () => {
+      await doLogin.execute(tLoginParams);
 
-    it("should rethrow InvalidValue if validatePassword throws it", async () => {
-      const tInvalidPassword = "invalid_password";
-      tLoginParams = new LoginParams(tEmail, tInvalidPassword);
-      mockValidatePassword.mockImplementation(() => {
-        throw new InvalidValue("password");
-      });
+      expect(mockValidator.validatePassword).toHaveBeenCalledWith(tPassword);
+      expect(mockValidator.validatePassword).toHaveBeenCalledTimes(1);
+    });
 
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(InvalidValue);
+    it("should throw InvalidValueError if validatePassword returns false", async () => {
+      const tPassword = "invalid_password";
+      tLoginParams = new LoginParams(tEmail, tPassword);
+      mockValidator.validatePassword.mockReturnValue(false);
+
+      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+        InvalidValueError
+      );
       await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
         `Invalid value: password`
       );
     });
 
-    it("should call validateEmail from Validator with correct parameters", () => {});
+    it("should call validateEmail from Validator with correct parameters", async () => {
+      await doLogin.execute(tLoginParams);
 
-    it("should throw InvalidValue if email is invalid", () => {});
+      expect(mockValidator.validateEmail).toHaveBeenCalledWith(tEmail);
+      expect(mockValidator.validateEmail).toHaveBeenCalledTimes(1);
+    });
+
+    it("should throw InvalidValueError if validateEmail returns false", async () => {
+      tEmail = "invalid_password";
+      tLoginParams = new LoginParams(tEmail, tEmail);
+      mockValidator.validateEmail.mockReturnValue(false);
+
+      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+        InvalidValueError
+      );
+      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+        `Invalid value: email`
+      );
+    });
   });
 
   it("should call getUserForLogin passing correct parameters", async () => {
@@ -70,32 +136,90 @@ describe("Test DoLogin Use Case", () => {
     await doLogin.execute(tLoginParams);
 
     //assert
-    expect(mockGetUserForLogin).toHaveBeenCalledWith(tEmail);
-    expect(mockGetUserForLogin).toHaveBeenCalledTimes(1);
+    expect(mockLoginRepository.getUserForLogin).toHaveBeenCalledWith(tEmail);
+    expect(mockLoginRepository.getUserForLogin).toHaveBeenCalledTimes(1);
   });
 
-  describe("If repository throws UserNotFound", () => {
-    it("should throw UserNotFound", async () => {
+  describe("If repository throws", () => {
+    it("should rethrow UserNotFoundError", async () => {
       tLoginParams = new LoginParams("incorrect@mail.com", "password");
-      mockGetUserForLogin.mockImplementation(() => {
-        throw new UserNotFound();
+      mockLoginRepository.getUserForLogin.mockImplementation(() => {
+        throw new UserNotFoundError();
       });
 
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(UserNotFound);
+      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+        UserNotFoundError
+      );
+    });
+
+    it("should rethrow ConnectionError", async () => {
+      mockLoginRepository.getUserForLogin.mockImplementation(() => {
+        throw new ConnectionError();
+      });
+
+      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+        ConnectionError
+      );
     });
   });
 
   describe("If user is found", () => {
-    it("should call encryptPassword from Encrypter with correct parameters", () => {});
+    it("should call encryptPassword from Encrypter with correct parameters", async () => {
+      await doLogin.execute(tLoginParams);
+
+      expect(mockEncrypter.encryptPassword).toBeCalledWith(tPassword);
+      expect(mockEncrypter.encryptPassword).toHaveBeenCalledTimes(1);
+    });
 
     describe("If password is wrong", () => {
-      it("should throw AuthenticationError if User's password is different from encrypted", () => {});
+      it("should throw AuthenticationError if User's password is different from encrypted", async () => {
+        tPassword = "wrong_password";
+        tPasswordHash = "wrong_password_hash";
+        tLoginParams = new LoginParams(tEmail, tPassword);
+        mockEncrypter.encryptPassword.mockReturnValue(tPasswordHash);
+
+        await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
+          AuthenticationError
+        );
+      });
     });
 
     describe("If password is correct", () => {
-      it("should call generateJWTToken from TokenGenerator", () => {});
+      it("should call generateJWTToken from TokenGenerator passing password hash", async () => {
+        await doLogin.execute(tLoginParams);
 
-      it("should return a valid LoginReturn with User and token", () => {});
+        expect(mockTokenGenerator.generateJWTToken).toBeCalledWith(
+          tPasswordHash
+        );
+        expect(mockTokenGenerator.generateJWTToken).toBeCalledTimes(1);
+      });
+
+      it("should call getTimeNow from Timer", async () => {
+        await doLogin.execute(tLoginParams);
+
+        expect(mockTimer.getTimeNow).toBeCalledTimes(1);
+      });
+
+      it("should call saveSession from LoginRepository with correct parameters", async () => {
+        await doLogin.execute(tLoginParams);
+
+        expect(mockLoginRepository.saveSession).toBeCalledWith(tSession);
+        expect(mockLoginRepository.saveSession).toBeCalledTimes(1);
+      });
+
+      it("should rethrow ConnectionError if saveSession throws", async () => {
+        mockLoginRepository.saveSession.mockImplementation(() => {
+          throw new ConnectionError();
+        });
+
+        expect(doLogin.execute(tLoginParams)).rejects.toThrow(ConnectionError);
+      });
+
+      it("should return a valid Session", async () => {
+        const session = await doLogin.execute(tLoginParams);
+
+        expect(session).toEqual(tSession);
+      });
     });
   });
 });

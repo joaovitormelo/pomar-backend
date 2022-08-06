@@ -1,11 +1,8 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: "ts-jest",
   testEnvironment: "node",
-  globals: {
-    "ts-jest": {
-      compiler: "ttypescript",
-    },
+  transform: {
+    "^.+\\.(t|j)sx?$": "@swc/jest",
   },
-  setupFiles: ["<rootDir>/automockconfig.ts"],
+  roots: ["<rootDir>/__tests__/"],
 };
