@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/joaovitormelo/pomar-backend#readme",
   "devDependencies": {
+    "@swc/jest": "^0.2.22",
     "@types/jest": "^28.1.6",
     "husky": "^8.0.1",
     "jest": "^28.1.1",

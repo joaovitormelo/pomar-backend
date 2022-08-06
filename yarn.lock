@@ -368,6 +368,13 @@
     "slash" "^3.0.0"
     "strip-ansi" "^6.0.0"
 
+"@jest/create-cache-key-function@^27.4.2":
+  "integrity" "sha512-dmH1yW+makpTSURTy8VzdUwFnfQh1G8R+DxO2Ho2FFmBbKFEVm+3jWdvFhE2VqB/LATCTokkP0dotjyQyw5/AQ=="
+  "resolved" "https://registry.npmjs.org/@jest/create-cache-key-function/-/create-cache-key-function-27.5.1.tgz"
+  "version" "27.5.1"
+  dependencies:
+    "@jest/types" "^27.5.1"
+
 "@jest/environment@^28.1.1":
   "integrity" "sha512-9auVQ2GzQ7nrU+lAr8KyY838YahElTX9HVjbQPPS2XjlxQ+na18G113OoBhyBGBtD6ZnO/SrUy5WR8EzOj1/Uw=="
   "resolved" "https://registry.npmjs.org/@jest/environment/-/environment-28.1.1.tgz"
@@ -502,6 +509,17 @@
     "slash" "^3.0.0"
     "write-file-atomic" "^4.0.1"
 
+"@jest/types@^27.5.1":
+  "integrity" "sha512-Cx46iJ9QpwQTjIdq5VJu2QTMMs3QlEjI0x1QbBP5W1+nMzyc2XmimiRR/CbX9TO0cPTeUlxWMOu8mslYsJ8DEw=="
+  "resolved" "https://registry.npmjs.org/@jest/types/-/types-27.5.1.tgz"
+  "version" "27.5.1"
+  dependencies:
+    "@types/istanbul-lib-coverage" "^2.0.0"
+    "@types/istanbul-reports" "^3.0.0"
+    "@types/node" "*"
+    "@types/yargs" "^16.0.0"
+    "chalk" "^4.0.0"
+
 "@jest/types@^28.0.0", "@jest/types@^28.1.1":
   "integrity" "sha512-vRXVqSg1VhDnB8bWcmvLzmg0Bt9CRKVgHPXqYwvWMX3TvAjeO+nRuK6+VdTKCtWOvYlmkF/HqNAL/z+N3B53Kw=="
   "resolved" "https://registry.npmjs.org/@jest/types/-/types-28.1.1.tgz"
@@ -580,6 +598,37 @@
   "version" "9.1.2"
   dependencies:
     "@sinonjs/commons" "^1.7.0"
+
+"@swc/core-win32-x64-msvc@1.2.223":
+  "integrity" "sha512-nzL8rwzMFA9cBK2s+QBMPcNnoGSPMfgY9ypRw/nTp0hQDgdLOXHy9moGFJg8dbdQD39kC5s8yQ0BmyKvePILgg=="
+  "resolved" "https://registry.npmjs.org/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.2.223.tgz"
+  "version" "1.2.223"
+
+"@swc/core@*", "@swc/core@>=1.2.50":
+  "integrity" "sha512-LcKX1frJ1iJDSYlY9Bg0vm0rYsXloITh6PdEYM5amT73J9mC1c2YpWLnWQiH2QpcyblyMhX1pk1eZ2JZjaynrQ=="
+  "resolved" "https://registry.npmjs.org/@swc/core/-/core-1.2.223.tgz"
+  "version" "1.2.223"
+  optionalDependencies:
+    "@swc/core-android-arm-eabi" "1.2.223"
+    "@swc/core-android-arm64" "1.2.223"
+    "@swc/core-darwin-arm64" "1.2.223"
+    "@swc/core-darwin-x64" "1.2.223"
+    "@swc/core-freebsd-x64" "1.2.223"
+    "@swc/core-linux-arm-gnueabihf" "1.2.223"
+    "@swc/core-linux-arm64-gnu" "1.2.223"
+    "@swc/core-linux-arm64-musl" "1.2.223"
+    "@swc/core-linux-x64-gnu" "1.2.223"
+    "@swc/core-linux-x64-musl" "1.2.223"
+    "@swc/core-win32-arm64-msvc" "1.2.223"
+    "@swc/core-win32-ia32-msvc" "1.2.223"
+    "@swc/core-win32-x64-msvc" "1.2.223"
+
+"@swc/jest@^0.2.22":
+  "integrity" "sha512-PIUIk9IdB1oAVfF9zNIfYoMBoEhahrrSvyryFANas7swC1cF0L5HR0f9X4qfet46oyCHCBtNcSpN0XJEOFIKlw=="
+  "resolved" "https://registry.npmjs.org/@swc/jest/-/jest-0.2.22.tgz"
+  "version" "0.2.22"
+  dependencies:
+    "@jest/create-cache-key-function" "^27.4.2"
 
 "@tsconfig/node10@^1.0.7":
   "integrity" "sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA=="
@@ -704,6 +753,13 @@
   "integrity" "sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA=="
   "resolved" "https://registry.npmjs.org/@types/yargs-parser/-/yargs-parser-21.0.0.tgz"
   "version" "21.0.0"
+
+"@types/yargs@^16.0.0":
+  "integrity" "sha512-T8Yc9wt/5LbJyCaLiHPReJa0kApcIgJ7Bn735GjItUfh08Z1pJvu8QZqb9s+mMvKV6WUQRV7K2R46YbjMXTTJw=="
+  "resolved" "https://registry.npmjs.org/@types/yargs/-/yargs-16.0.4.tgz"
+  "version" "16.0.4"
+  dependencies:
+    "@types/yargs-parser" "*"
 
 "@types/yargs@^17.0.8":
   "integrity" "sha512-gmEaFwpj/7f/ROdtIlci1R1VYU1J4j95m8T+Tj3iBgiBFKg1foE/PSl93bBd5T9LDXNPo8UlNN6W0qwD8O5OaA=="
