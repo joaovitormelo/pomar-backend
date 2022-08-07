@@ -1,6 +1,10 @@
 import moment from "moment";
 
-export class Timer {
+export interface TimerContract {
+  getTimeNow: () => string;
+}
+
+export default class Timer implements TimerContract {
   getTimeNow(): string {
     return moment().format();
   }

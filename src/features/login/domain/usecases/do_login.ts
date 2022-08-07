@@ -4,7 +4,7 @@ import {
 } from "../../../../core/errors/errors";
 import { EncrypterContract } from "../../../../core/utils/encrypter_contract";
 import { ValidatorContract } from "../../../../core/utils/validator_contract";
-import { Timer } from "../../utils/Timer";
+import { TimerContract } from "../../utils/Timer";
 import { TokenGeneratorContract } from "../../utils/TokenGenerator";
 import { Session } from "../entities/session";
 import { User } from "../entities/user";
@@ -25,14 +25,14 @@ export default class DoLogin {
   validator: ValidatorContract;
   encrypter: EncrypterContract;
   tokenGenerator: TokenGeneratorContract;
-  timer: Timer;
+  timer: TimerContract;
 
   constructor(
     loginRepository: LoginRepositoryContract,
     validator: ValidatorContract,
     encrypter: EncrypterContract,
     tokenGenerator: TokenGeneratorContract,
-    timer: Timer
+    timer: TimerContract
   ) {
     this.loginRepository = loginRepository;
     this.validator = validator;

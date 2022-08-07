@@ -13,7 +13,7 @@ import { ValidatorContract } from "../../../../../src/core/utils/validator_contr
 import { EncrypterContract } from "../../../../../src/core/utils/encrypter_contract";
 import { TokenGeneratorContract } from "../../../../../src/features/login/utils/TokenGenerator";
 import { Session } from "../../../../../src/features/login/domain/entities/session";
-import { Timer } from "../../../../../src/features/login/utils/Timer";
+import { TimerContract } from "../../../../../src/features/login/utils/Timer";
 
 class MockLoginRepository implements LoginRepositoryContract {
   getUserForLogin: jest.Mock = jest.fn();
@@ -33,7 +33,7 @@ class MockTokenGenerator implements TokenGeneratorContract {
   generateJWTToken: jest.Mock = jest.fn();
 }
 
-class MockTimer implements Timer {
+class MockTimer implements TimerContract {
   getTimeNow: jest.Mock = jest.fn();
 }
 
