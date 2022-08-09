@@ -1,10 +1,12 @@
+import { User } from "./user";
+
 export class Session {
-  idUser: number;
+  user: User;
   JWTToken: string;
   loginTime: string;
 
-  constructor(idUser: number, JWTToken: string, loginTime: string) {
-    this.idUser = idUser;
+  constructor(user: User, JWTToken: string, loginTime: string) {
+    this.user = user;
     this.JWTToken = JWTToken;
     this.loginTime = loginTime;
   }

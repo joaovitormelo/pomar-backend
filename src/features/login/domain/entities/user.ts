@@ -1,17 +1,19 @@
+import { Person } from "./person";
+
 export class User {
   idUser: number;
-  idPerson: number;
+  person: Person;
   password: string;
   typeUser: number;
 
   constructor(
     idUser: number,
-    idPerson: number,
+    person: Person,
     password: string,
     typeUser: number
   ) {
     this.idUser = idUser;
-    this.idPerson = idPerson;
+    this.person = person;
     this.password = password;
     this.typeUser = typeUser;
   }
