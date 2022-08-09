@@ -5,8 +5,10 @@ export class UserNotFoundError extends Error {
 }
 
 export class InvalidValueError extends Error {
+  value: string;
   constructor(value) {
     super(`Invalid value: ${value}`);
+    this.value = value;
   }
 }
 

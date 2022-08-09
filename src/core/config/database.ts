@@ -1,10 +1,11 @@
 "use strict";
 
-const { Client } = require("pg");
+import { Client } from "pg";
+
 const { databaseConfig } = require("./globals");
 
 class Database {
-  conn = null;
+  conn: Client;
   databaseConfig = {
     user: process.env.DATABASE_USER,
     host: process.env.DATABASE_HOST,
@@ -20,4 +21,4 @@ class Database {
   };
 }
 
-module.exports = Database();
+module.exports = new Database();
