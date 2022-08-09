@@ -11,9 +11,13 @@ import {
 } from "../../../../../src/core/errors/errors";
 import { ValidatorContract } from "../../../../../src/core/utils/validator_contract";
 import { EncrypterContract } from "../../../../../src/core/utils/encrypter_contract";
-import { TokenGeneratorContract } from "../../../../../src/features/login/utils/TokenGenerator";
+import {
+  TokenGeneratorContract,
+  TokenGeneratorParams,
+} from "../../../../../src/features/login/utils/TokenGenerator";
 import { Session } from "../../../../../src/features/login/domain/entities/session";
 import { TimerContract } from "../../../../../src/features/login/utils/Timer";
+import { Person } from "../../../../../src/features/login/domain/entities/person";
 
 class MockLoginRepository implements LoginRepositoryContract {
   getUserForLogin: jest.Mock = jest.fn();
@@ -43,6 +47,7 @@ describe("Test DoLogin Use Case", () => {
   var tPasswordHash: string;
   var tLoginParams: LoginParams;
   var tUser: User;
+  var tTokenGeneratorParams: TokenGeneratorParams;
   var tJWTToken: string;
   var tTimeNow: string;
   var tSession: Session;
@@ -59,10 +64,19 @@ describe("Test DoLogin Use Case", () => {
     tPassword = "password";
     tPasswordHash = "password_hash";
     tLoginParams = new LoginParams(tEmail, tPassword);
-    tUser = new User(1, 1, tPasswordHash, 0);
+    tUser = new User(
+      1,
+      new Person(1, "person_name", tEmail, "person_phone"),
+      tPasswordHash,
+      0 // Admin
+    );
+    tTokenGeneratorParams = new TokenGeneratorParams(
+      tUser.idUser,
+      tUser.person.email
+    );
     tJWTToken = "valid_token";
-    tTimeNow = "06/08/2022 17:20";
-    tSession = new Session(tUser.idUser, tJWTToken, tTimeNow);
+    tTimeNow = "time_now";
+    tSession = new Session(tUser, tJWTToken, tTimeNow);
     //Mock Repository
     mockLoginRepository = new MockLoginRepository();
     mockLoginRepository.getUserForLogin.mockResolvedValue(tUser);
@@ -185,11 +199,11 @@ describe("Test DoLogin Use Case", () => {
     });
 
     describe("If password is correct", () => {
-      it("should call generateJWTToken from TokenGenerator passing password hash", async () => {
+      it("should call generateJWTToken from TokenGenerator passing correct parameters", async () => {
         await doLogin.execute(tLoginParams);
 
         expect(mockTokenGenerator.generateJWTToken).toBeCalledWith(
-          tPasswordHash
+          tTokenGeneratorParams
         );
         expect(mockTokenGenerator.generateJWTToken).toBeCalledTimes(1);
       });
@@ -215,10 +229,11 @@ describe("Test DoLogin Use Case", () => {
         expect(doLogin.execute(tLoginParams)).rejects.toThrow(ConnectionError);
       });
 
-      it("should return a valid Session", async () => {
-        const session = await doLogin.execute(tLoginParams);
+      it("should return a valid Session with empty password", async () => {
+        const session: Session = await doLogin.execute(tLoginParams);
 
         expect(session).toEqual(tSession);
+        expect(session.user.password).toBe("");
       });
     });
   });
