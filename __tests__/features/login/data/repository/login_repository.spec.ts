@@ -3,10 +3,11 @@ import {
   UserNotFoundError,
 } from "../../../../../src/core/errors/errors";
 import { LoginDatabaseSourceContract } from "../../../../../src/features/login/data/datasources/login_database_source";
-import { LoginRepository } from "../../../../../src/features/login/data/repositories/login_repository";
 import { Session } from "../../../../../src/features/login/domain/entities/session";
-import { PersonModel } from "../../../../../src/features/login/presentation/models/person_model";
-import { UserModel } from "../../../../../src/features/login/presentation/models/user_model";
+import { PersonModel } from "../../../../../src/features/login/data/models/person_model";
+import { UserModel } from "../../../../../src/features/login/data/models/user_model";
+import { SessionModel } from "../../../../../src/features/login/data/models/session_model";
+import { LoginRepository } from "../../../../../src/features/login/data/repositories/login_repository";
 
 class MockLoginDatabaseSource implements LoginDatabaseSourceContract {
   getUserForLogin: jest.Mock = jest.fn();
@@ -17,6 +18,7 @@ describe("Test LoginRepository", () => {
   var tEmail: string;
   var tUserModel: UserModel;
   var tSession: Session;
+  var tSessionModel: SessionModel;
   var mockLoginDatabaseSource: MockLoginDatabaseSource;
   var loginRepository: LoginRepository;
 
@@ -29,7 +31,8 @@ describe("Test LoginRepository", () => {
       "password_hash",
       0 // Admin
     );
-    tSession = new Session(tUserModel, "valid_token", "time_now");
+    tSession = new Session(1, tUserModel, "valid_token", "time_now");
+    tSessionModel = tSession as SessionModel;
     //Mock LoginDatabaseSource
     mockLoginDatabaseSource = new MockLoginDatabaseSource();
     mockLoginDatabaseSource.getUserForLogin.mockResolvedValue(tUserModel);
@@ -81,7 +84,7 @@ describe("Test LoginRepository", () => {
       await loginRepository.saveSession(tSession);
 
       expect(mockLoginDatabaseSource.saveSession).toHaveBeenCalledWith(
-        tSession
+        tSessionModel
       );
       expect(mockLoginDatabaseSource.saveSession).toHaveBeenCalledTimes(1);
     });

@@ -1,4 +1,3 @@
-import { User } from "../../../../../src/features/login/domain/entities/user";
 import { LoginRepositoryContract } from "../../../../../src/features/login/domain/repositories/login_repository_contract";
 import DoLogin, {
   LoginParams,
@@ -9,14 +8,15 @@ import {
   InvalidValueError,
   UserNotFoundError,
 } from "../../../../../src/core/errors/errors";
-import { ValidatorContract } from "../../../../../src/core/utils/validator_contract";
-import { EncrypterContract } from "../../../../../src/core/utils/encrypter_contract";
+import { ValidatorContract } from "../../../../../src/core/utils/validator";
+import { EncrypterContract } from "../../../../../src/core/utils/encrypter";
 import {
   TokenGeneratorContract,
   TokenGeneratorParams,
 } from "../../../../../src/features/login/utils/TokenGenerator";
-import { Session } from "../../../../../src/features/login/domain/entities/session";
 import { TimerContract } from "../../../../../src/features/login/utils/Timer";
+import { User } from "../../../../../src/features/login/domain/entities/user";
+import { Session } from "../../../../../src/features/login/domain/entities/session";
 import { Person } from "../../../../../src/features/login/domain/entities/person";
 
 class MockLoginRepository implements LoginRepositoryContract {
@@ -76,7 +76,7 @@ describe("Test DoLogin Use Case", () => {
     );
     tJWTToken = "valid_token";
     tTimeNow = "time_now";
-    tSession = new Session(tUser, tJWTToken, tTimeNow);
+    tSession = new Session(1, tUser, tJWTToken, tTimeNow);
     //Mock Repository
     mockLoginRepository = new MockLoginRepository();
     mockLoginRepository.getUserForLogin.mockResolvedValue(tUser);

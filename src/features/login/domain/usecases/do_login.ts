@@ -2,8 +2,8 @@ import {
   AuthenticationError,
   InvalidValueError,
 } from "../../../../core/errors/errors";
-import { EncrypterContract } from "../../../../core/utils/encrypter_contract";
-import { ValidatorContract } from "../../../../core/utils/validator_contract";
+import { EncrypterContract } from "../../../../core/utils/encrypter";
+import { ValidatorContract } from "../../../../core/utils/validator";
 import { TimerContract } from "../../utils/Timer";
 import {
   TokenGeneratorContract,
@@ -61,7 +61,7 @@ export default class DoLogin {
       );
       const timeNow = this.timer.getTimeNow();
       user.password = "";
-      const session = new Session(user, token, timeNow);
+      const session = new Session(1, user, token, timeNow);
       this.loginRepository.saveSession(session);
       return session;
     }
