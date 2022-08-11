@@ -1,5 +1,3 @@
-import { InvalidValueError } from "../errors/errors";
-
 const emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 //Mínimo 8 caracteres, uma letra maiúscula e um número
 const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
