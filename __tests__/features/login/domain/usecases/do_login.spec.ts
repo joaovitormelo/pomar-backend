@@ -13,8 +13,8 @@ import { EncrypterContract } from "../../../../../src/core/utils/encrypter";
 import {
   TokenGeneratorContract,
   TokenGeneratorParams,
-} from "../../../../../src/features/login/utils/TokenGenerator";
-import { TimerContract } from "../../../../../src/features/login/utils/Timer";
+} from "../../../../../src/features/login/utils/token_generator";
+import { TimerContract } from "../../../../../src/features/login/utils/timer";
 import { User } from "../../../../../src/features/login/domain/entities/user";
 import { Session } from "../../../../../src/features/login/domain/entities/session";
 import { Person } from "../../../../../src/features/login/domain/entities/person";

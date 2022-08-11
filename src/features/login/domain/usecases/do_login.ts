@@ -4,11 +4,11 @@ import {
 } from "../../../../core/errors/errors";
 import { EncrypterContract } from "../../../../core/utils/encrypter";
 import { ValidatorContract } from "../../../../core/utils/validator";
-import { TimerContract } from "../../utils/Timer";
+import { TimerContract } from "../../utils/timer";
 import {
   TokenGeneratorContract,
   TokenGeneratorParams,
-} from "../../utils/TokenGenerator";
+} from "../../utils/token_generator";
 import { Session } from "../entities/session";
 import { User } from "../entities/user";
 import { LoginRepositoryContract } from "../repositories/login_repository_contract";
@@ -52,11 +52,11 @@ export default class DoLogin {
       throw new InvalidValueError("password");
     }
     user = await this.loginRepository.getUserForLogin(params.email);
-    const passwordHash = this.encrypter.encryptPassword(params.password);
+    const passwordHash = await this.encrypter.encryptPassword(params.password);
     if (passwordHash != user.password) {
       throw new AuthenticationError();
     } else {
-      const token = this.tokenGenerator.generateJWTToken(
+      const token = await this.tokenGenerator.generateJWTToken(
         new TokenGeneratorParams(user.idUser, user.person.email)
       );
       const timeNow = this.timer.getTimeNow();
