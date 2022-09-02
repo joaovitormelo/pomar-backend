@@ -22,15 +22,11 @@ import { Person } from "../../../../../src/features/login/domain/entities/person
 class MockLoginRepository implements LoginRepositoryContract {
   getUserForLogin: jest.Mock = jest.fn();
   saveSession: jest.Mock = jest.fn();
-}
-
-class MockValidator implements ValidatorContract {
-  validateEmail: jest.Mock = jest.fn();
-  validatePassword: jest.Mock = jest.fn();
+  deleteSession = jest.fn();
 }
 
 class MockEncrypter implements EncrypterContract {
-  encryptPassword: jest.Mock = jest.fn();
+  comparePassword: jest.Mock = jest.fn();
 }
 
 class MockTokenGenerator implements TokenGeneratorContract {
@@ -53,7 +49,6 @@ describe("Test DoLogin Use Case", () => {
   var tSession: Session;
   var doLogin: DoLogin;
   var mockLoginRepository: MockLoginRepository;
-  var mockValidator: MockValidator;
   var mockEncrypter: MockEncrypter;
   var mockTokenGenerator: MockTokenGenerator;
   var mockTimer: MockTimer;
@@ -80,13 +75,9 @@ describe("Test DoLogin Use Case", () => {
     //Mock Repository
     mockLoginRepository = new MockLoginRepository();
     mockLoginRepository.getUserForLogin.mockResolvedValue(tUser);
-    //Mock Validator
-    mockValidator = new MockValidator();
-    mockValidator.validatePassword.mockResolvedValue(true);
-    mockValidator.validateEmail.mockResolvedValue(true);
     //Mock Encrypter
     mockEncrypter = new MockEncrypter();
-    mockEncrypter.encryptPassword.mockReturnValue(tPasswordHash);
+    mockEncrypter.comparePassword.mockReturnValue(true);
     //Mock TokenGenerator
     mockTokenGenerator = new MockTokenGenerator();
     mockTokenGenerator.generateJWTToken.mockReturnValue(tJWTToken);
@@ -96,53 +87,10 @@ describe("Test DoLogin Use Case", () => {
     //Create sut
     doLogin = new DoLogin(
       mockLoginRepository,
-      mockValidator,
       mockEncrypter,
       mockTokenGenerator,
       mockTimer
     );
-  });
-
-  describe("Validation", () => {
-    it("should call validatePassword from Validator with correct parameters", async () => {
-      await doLogin.execute(tLoginParams);
-
-      expect(mockValidator.validatePassword).toHaveBeenCalledWith(tPassword);
-      expect(mockValidator.validatePassword).toHaveBeenCalledTimes(1);
-    });
-
-    it("should throw InvalidValueError if validatePassword returns false", async () => {
-      const tPassword = "invalid_password";
-      tLoginParams = new LoginParams(tEmail, tPassword);
-      mockValidator.validatePassword.mockReturnValue(false);
-
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
-        InvalidValueError
-      );
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
-        `Invalid value: password`
-      );
-    });
-
-    it("should call validateEmail from Validator with correct parameters", async () => {
-      await doLogin.execute(tLoginParams);
-
-      expect(mockValidator.validateEmail).toHaveBeenCalledWith(tEmail);
-      expect(mockValidator.validateEmail).toHaveBeenCalledTimes(1);
-    });
-
-    it("should throw InvalidValueError if validateEmail returns false", async () => {
-      tEmail = "invalid_password";
-      tLoginParams = new LoginParams(tEmail, tEmail);
-      mockValidator.validateEmail.mockReturnValue(false);
-
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
-        InvalidValueError
-      );
-      await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
-        `Invalid value: email`
-      );
-    });
   });
 
   it("should call getUserForLogin passing correct parameters", async () => {
@@ -178,19 +126,21 @@ describe("Test DoLogin Use Case", () => {
   });
 
   describe("If user is found", () => {
-    it("should call encryptPassword from Encrypter with correct parameters", async () => {
+    it("should call compare from Encrypter with correct parameters", async () => {
       await doLogin.execute(tLoginParams);
 
-      expect(mockEncrypter.encryptPassword).toBeCalledWith(tPassword);
-      expect(mockEncrypter.encryptPassword).toHaveBeenCalledTimes(1);
+      expect(mockEncrypter.comparePassword).toBeCalledWith(
+        tPassword,
+        tPasswordHash
+      );
+      expect(mockEncrypter.comparePassword).toHaveBeenCalledTimes(1);
     });
 
     describe("If password is wrong", () => {
       it("should throw AuthenticationError if User's password is different from encrypted", async () => {
         tPassword = "wrong_password";
-        tPasswordHash = "wrong_password_hash";
         tLoginParams = new LoginParams(tEmail, tPassword);
-        mockEncrypter.encryptPassword.mockReturnValue(tPasswordHash);
+        mockEncrypter.comparePassword.mockReturnValue(false);
 
         await expect(doLogin.execute(tLoginParams)).rejects.toThrow(
           AuthenticationError

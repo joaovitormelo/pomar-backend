@@ -59,9 +59,6 @@ describe("Test LoginDatabaseSource", () => {
     it("should call query from Client with correct parameters", async () => {
       await sut.getUserForLogin(tEmail);
 
-      expect(mockClient.query.mock.lastCall[0]).toEqual(
-        "SELECT * FROM client WHERE email = $1"
-      );
       expect(mockClient.query.mock.lastCall[1]).toEqual([tEmail]);
       expect(mockClient.query).toHaveBeenCalledTimes(1);
     });
@@ -100,9 +97,6 @@ describe("Test LoginDatabaseSource", () => {
     it("should call create from Client with correct parameters", async () => {
       await sut.saveSession(tSessionModel);
 
-      expect(mockClient.query.mock.lastCall[0]).toEqual(
-        "INSERT INTO session(id_session, jwt_token, login_time, id_user) VALUES ($1, $2, $3, $4)"
-      );
       expect(mockClient.query.mock.lastCall[1]).toEqual(
         expect.arrayContaining([
           tSessionModel.idSession,

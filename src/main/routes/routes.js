@@ -1,6 +1,6 @@
 const defaultRoutes = require("./defaultRoutes");
 
-modules.exports = (server) => {
+module.exports = (server) => {
   //Routes
 
   defaultRoutes(server);

@@ -25,35 +25,29 @@ export class LoginParams {
 
 export default class DoLogin {
   loginRepository: LoginRepositoryContract;
-  validator: ValidatorContract;
   encrypter: EncrypterContract;
   tokenGenerator: TokenGeneratorContract;
   timer: TimerContract;
 
   constructor(
     loginRepository: LoginRepositoryContract,
-    validator: ValidatorContract,
     encrypter: EncrypterContract,
     tokenGenerator: TokenGeneratorContract,
     timer: TimerContract
   ) {
     this.loginRepository = loginRepository;
-    this.validator = validator;
     this.encrypter = encrypter;
     this.tokenGenerator = tokenGenerator;
     this.timer = timer;
   }
 
   async execute(params: LoginParams) {
-    var user: User;
-    if (!this.validator.validateEmail(params.email)) {
-      throw new InvalidValueError("email");
-    } else if (!this.validator.validatePassword(params.password)) {
-      throw new InvalidValueError("password");
-    }
-    user = await this.loginRepository.getUserForLogin(params.email);
-    const passwordHash = await this.encrypter.encryptPassword(params.password);
-    if (passwordHash != user.password) {
+    var user: User = await this.loginRepository.getUserForLogin(params.email);
+    const match = await this.encrypter.comparePassword(
+      params.password,
+      user.password
+    );
+    if (!match) {
       throw new AuthenticationError();
     } else {
       const token = await this.tokenGenerator.generateJWTToken(

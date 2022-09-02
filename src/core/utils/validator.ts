@@ -18,10 +18,11 @@ export class Validator implements ValidatorContract {
     }
     return true;
   };
+
   validatePassword = (password) => {
     if (typeof password !== "string") {
       return false;
-    } else if (password.length > 45) {
+    } else if (password.length > 100) {
       return false;
     } else if (!password.match(passwordRegEx)) {
       return false;

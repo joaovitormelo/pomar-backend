@@ -1,4 +1,4 @@
-import { JsonwebtokenWrapper } from "../../../main/wrappers/jsonwebtoken_wrapper";
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 export class TokenGeneratorParams {
@@ -16,18 +16,12 @@ export interface TokenGeneratorContract {
 }
 
 export class TokenGenerator implements TokenGeneratorContract {
-  jsonwebtokenWrapper: JsonwebtokenWrapper;
-
-  constructor(jsonwebtokenWrapper: JsonwebtokenWrapper) {
-    this.jsonwebtokenWrapper = jsonwebtokenWrapper;
-  }
-
   generateJWTToken = async (params: TokenGeneratorParams) => {
     return await new Promise<string>((resolve, reject) => {
-      const callback = (JWTToken: string) => {
+      const callback = (err, JWTToken) => {
         resolve(JWTToken);
       };
-      this.jsonwebtokenWrapper.sign(
+      jwt.sign(
         { idUser: params.idUser, email: params.email },
         process.env.JWT_SECRET,
         callback

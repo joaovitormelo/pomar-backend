@@ -1,4 +1,3 @@
-import { InvalidValueError } from "../../../src/core/errors/errors";
 import { Validator } from "../../../src/core/utils/validator";
 
 describe("Test Validator", () => {
@@ -48,8 +47,9 @@ describe("Test Validator", () => {
       expect(isValid).toBe(false);
     });
 
-    it("should return false if value has more than 45 characters", () => {
-      const tBigPw = "13scUCsRbO5hNJ7BlRrbhkjZVtAuAyHqCBpcT531SoWcwf";
+    it("should return false if value has more than 100 characters", () => {
+      const tBigPw =
+        "RvVdDhAbqyHURWIxlUZMKjAi8nvjaMH0iNrvYps9nv1ZHE27eegAPDvQbdAykwpXWO2VkbJ3zybUzxQKD1scnddJoES5pyPaK9wok";
 
       const isValid = sut.validatePassword(tBigPw);
 

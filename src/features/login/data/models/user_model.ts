@@ -23,6 +23,15 @@ export class UserModel extends User implements MyModel {
     };
   };
 
+  static fromEntity = (user: User) => {
+    return new UserModel(
+      user.idUser,
+      PersonModel.fromEntity(user.person),
+      user.password,
+      user.typeUser
+    );
+  };
+
   static fromJsObject = (JSObject: any) => {
     return new UserModel(
       JSObject.id_user,

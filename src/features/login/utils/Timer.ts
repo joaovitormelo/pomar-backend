@@ -1,4 +1,5 @@
-import moment from "moment";
+const moment = require("moment-timezone");
+moment.tz.setDefault("America/Sao_Paulo");
 
 export interface TimerContract {
   getTimeNow: () => string;
@@ -6,6 +7,6 @@ export interface TimerContract {
 
 export default class Timer implements TimerContract {
   getTimeNow(): string {
-    return moment().format();
+    return moment().format("YYYY-MM-DD HH:mm:ss");
   }
 }

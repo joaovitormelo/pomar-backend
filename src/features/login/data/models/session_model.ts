@@ -16,10 +16,19 @@ export class SessionModel extends Session implements MyModel {
 
   toJSObject = () => {
     return {
-      idSession: this.idSession,
+      id_session: this.idSession,
       user: this.user.toJSObject(),
-      JWTToken: this.JWTToken,
-      loginTime: this.loginTime,
+      jwt_token: this.JWTToken,
+      login_time: this.loginTime,
     };
+  };
+
+  static fromEntity = (session: Session) => {
+    return new SessionModel(
+      session.idSession,
+      UserModel.fromEntity(session.user),
+      session.JWTToken,
+      session.loginTime
+    );
   };
 }

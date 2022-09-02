@@ -17,4 +17,8 @@ export class LoginRepository implements LoginRepositoryContract {
   saveSession = async (session: Session) => {
     await this.loginDatabaseSource.saveSession(session as SessionModel);
   };
+
+  deleteSession = async (idSession: number) => {
+    //throw new ConnectionError();
+  };
 }
