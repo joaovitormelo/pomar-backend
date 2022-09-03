@@ -9,6 +9,7 @@ import { UserModel } from "../models/user_model";
 export interface LoginDatabaseSourceContract {
   getUserForLogin: (email: string) => Promise<UserModel>;
   saveSession: (session: SessionModel) => Promise<void>;
+  deleteSession: (idSession: number) => Promise<void>;
 }
 
 export class LoginDatabaseSource implements LoginDatabaseSourceContract {
@@ -26,7 +27,6 @@ export class LoginDatabaseSource implements LoginDatabaseSourceContract {
         [email]
       );
     } catch (e) {
-      console.error(e);
       throw new ConnectionError();
     }
     if (!response.rows[0]) throw new UserNotFoundError();
@@ -35,9 +35,24 @@ export class LoginDatabaseSource implements LoginDatabaseSourceContract {
   };
 
   saveSession = async (session: SessionModel) => {
-    await this.client.query(
-      "INSERT INTO p.session(jwt_token, login_time, id_user) VALUES ($1, $2, $3)",
-      [session.JWTToken, session.loginTime, session.user.idUser]
-    );
+    try {
+      await this.client.query(
+        "INSERT INTO p.session(jwt_token, login_time, id_user) VALUES ($1, $2, $3)",
+        [session.JWTToken, session.loginTime, session.user.idUser]
+      );
+    } catch {
+      throw new ConnectionError();
+    }
+  };
+
+  deleteSession = async (idSession: number) => {
+    try {
+      await this.client.query("DELETE FROM p.session WHERE id_session = $1", [
+        idSession,
+      ]);
+    } catch (e) {
+      console.log(e);
+      throw new ConnectionError();
+    }
   };
 }

@@ -8,7 +8,7 @@ module.exports = (server, loginRouter: LoginRouter) => {
 
   router.post("/login", new ExpressAdapter(loginRouter.login).adapt);
 
-  router.post("/logout", new ExpressAdapter(loginRouter.login).adapt);
+  router.post("/logout", new ExpressAdapter(loginRouter.logout).adapt);
 
   server.use("/", router);
 };

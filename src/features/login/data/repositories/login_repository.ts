@@ -1,3 +1,4 @@
+import { ConnectionError } from "../../../../core/errors/errors";
 import { Session } from "../../domain/entities/session";
 import { LoginRepositoryContract } from "../../domain/repositories/login_repository_contract";
 import { LoginDatabaseSourceContract } from "../datasources/login_database_source";
@@ -19,6 +20,6 @@ export class LoginRepository implements LoginRepositoryContract {
   };
 
   deleteSession = async (idSession: number) => {
-    //throw new ConnectionError();
+    await this.loginDatabaseSource.deleteSession(idSession);
   };
 }

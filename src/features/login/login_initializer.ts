@@ -4,6 +4,7 @@ import { Validator } from "../../core/utils/validator";
 import { LoginDatabaseSource } from "./data/datasources/login_database_source";
 import { LoginRepository } from "./data/repositories/login_repository";
 import DoLogin from "./domain/usecases/do_login";
+import { Logout } from "./domain/usecases/logout";
 import { LoginRouter } from "./presentation/routers/login_router";
 import Timer from "./utils/timer";
 import { TokenGenerator } from "./utils/token_generator";
@@ -26,10 +27,11 @@ export class LoginInitializer {
       tokenGenerator,
       timer
     );
+    const logout = new Logout(loginRepository);
 
     //Presentation
     const validator = new Validator();
-    const loginRouter = new LoginRouter(validator, doLogin);
+    const loginRouter = new LoginRouter(validator, doLogin, logout);
 
     login(server, loginRouter);
   };
