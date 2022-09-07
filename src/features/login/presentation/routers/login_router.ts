@@ -9,6 +9,7 @@ import { ValidatorContract } from "../../../../core/utils/validator";
 import { SessionModel } from "../../data/models/session_model";
 import { Session } from "../../domain/entities/session";
 import DoLogin, { LoginParams } from "../../domain/usecases/do_login";
+import { DoValidateSession } from "../../domain/usecases/do_validate_session";
 import { Logout } from "../../domain/usecases/logout";
 
 export class HttpRequest {
@@ -35,15 +36,18 @@ export class LoginRouter {
   validator: ValidatorContract;
   doLoginUsecase: DoLogin;
   logoutUsecase: Logout;
+  doValidateSession: DoValidateSession;
 
   constructor(
     validator: ValidatorContract,
     doLoginUsecase: DoLogin,
-    logoutUsecase: Logout
+    logoutUsecase: Logout,
+    doValidateSession: DoValidateSession
   ) {
     this.validator = validator;
     this.doLoginUsecase = doLoginUsecase;
     this.logoutUsecase = logoutUsecase;
+    this.doValidateSession = doValidateSession;
   }
 
   login = async (httpRequest: HttpRequest) => {
@@ -91,26 +95,7 @@ export class LoginRouter {
         session: SessionModel.fromEntity(session).toJSObject(),
       });
     } catch (e) {
-      if (e instanceof ConnectionError) {
-        return new HttpResponse(ErrorMessages.infoConnectionError.status, {
-          code: ErrorMessages.infoConnectionError.code,
-          msg: ErrorMessages.infoConnectionError.msg,
-        });
-      } else if (e instanceof UserNotFoundError) {
-        return new HttpResponse(ErrorMessages.infoUserNotFoundError.status, {
-          code: ErrorMessages.infoUserNotFoundError.code,
-          msg: ErrorMessages.infoUserNotFoundError.msg,
-        });
-      } else if (e instanceof AuthenticationError) {
-        return new HttpResponse(ErrorMessages.infoAuthenticationError.status, {
-          code: ErrorMessages.infoAuthenticationError.code,
-          msg: ErrorMessages.infoAuthenticationError.msg,
-        });
-      } else {
-        return new HttpResponse(ErrorMessages.infoUnknownError.status, {
-          msg: ErrorMessages.infoUnknownError.msg,
-        });
-      }
+      return ErrorMessages.mapErrorToHttpResponse(e);
     }
   };
 
@@ -132,22 +117,47 @@ export class LoginRouter {
       });
     }
 
-    const idSession = httpRequest.body.id_session;
+    const idSession = parseInt(httpRequest.body.id_session);
 
     try {
       await this.logoutUsecase.execute(idSession);
       return new HttpResponse(200);
     } catch (e) {
-      if (e instanceof ConnectionError) {
-        return new HttpResponse(ErrorMessages.infoConnectionError.status, {
-          code: ErrorMessages.infoConnectionError.code,
-          msg: ErrorMessages.infoConnectionError.msg,
-        });
-      } else {
-        return new HttpResponse(ErrorMessages.infoUnknownError.status, {
-          msg: ErrorMessages.infoUnknownError.msg,
-        });
+      return ErrorMessages.mapErrorToHttpResponse(e);
+    }
+  };
+
+  validateSession = async (httpRequest: HttpRequest) => {
+    if (!httpRequest.body) {
+      return new HttpResponse(ErrorMessages.infoNoBody.status, {
+        code: ErrorMessages.infoNoBody.code,
+        msg: ErrorMessages.infoNoBody.msg,
+      });
+    }
+    if (!httpRequest.body.session == null) {
+      return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
+        code: ErrorMessages.infoMissingParameter.code,
+        msg: ErrorMessages.infoMissingParameter.msg,
+        target: "session",
+      });
+    }
+
+    var session: Session;
+    try {
+      session = SessionModel.fromClient(httpRequest.body.session);
+
+      try {
+        await this.doValidateSession.execute(session);
+        return new HttpResponse(200);
+      } catch (e) {
+        return ErrorMessages.mapErrorToHttpResponse(e);
       }
+    } catch {
+      return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+        code: ErrorMessages.infoInvalidValue.code,
+        msg: ErrorMessages.infoInvalidValue.msg,
+        target: "session",
+      });
     }
   };
 }

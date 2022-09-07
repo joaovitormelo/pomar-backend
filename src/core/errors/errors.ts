@@ -23,3 +23,15 @@ export class ConnectionError extends Error {
     super(`Connection error`);
   }
 }
+
+export class InvalidSessionError extends Error {
+  constructor() {
+    super(`Invalid session error`);
+  }
+}
+
+export class NoDataError extends Error {
+  constructor() {
+    super(`There is no matching data`);
+  }
+}

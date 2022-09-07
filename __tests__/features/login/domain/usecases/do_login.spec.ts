@@ -20,6 +20,7 @@ import { Session } from "../../../../../src/features/login/domain/entities/sessi
 import { Person } from "../../../../../src/features/login/domain/entities/person";
 
 class MockLoginRepository implements LoginRepositoryContract {
+  getSessionById: (idSession: number) => Promise<Session>;
   getUserForLogin: jest.Mock = jest.fn();
   saveSession: jest.Mock = jest.fn();
   deleteSession = jest.fn();

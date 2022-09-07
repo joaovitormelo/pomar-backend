@@ -1,5 +1,6 @@
 import { Session } from "../../domain/entities/session";
 import { MyModel } from "./my_model";
+import { PersonModel } from "./person_model";
 import { UserModel } from "./user_model";
 
 export class SessionModel extends Session implements MyModel {
@@ -29,6 +30,24 @@ export class SessionModel extends Session implements MyModel {
       UserModel.fromEntity(session.user),
       session.JWTToken,
       session.loginTime
+    );
+  };
+
+  static fromDatabase = (session: any) => {
+    return new SessionModel(
+      session.id_session,
+      UserModel.fromDatabase(session),
+      session.jwt_token,
+      session.login_time
+    );
+  };
+
+  static fromClient = (session: any) => {
+    return new SessionModel(
+      session.id_session,
+      UserModel.fromClient(session.user),
+      session.jwt_token,
+      session.login_time
     );
   };
 }

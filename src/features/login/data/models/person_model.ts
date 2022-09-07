@@ -19,4 +19,22 @@ export class PersonModel extends Person implements MyModel {
       person.phone
     );
   };
+
+  static fromDatabase = (person: any) => {
+    return new PersonModel(
+      person.id_person,
+      person.name,
+      person.email,
+      person.phone
+    );
+  };
+
+  static fromClient = (person: any) => {
+    return new PersonModel(
+      person.id_person,
+      person.name,
+      person.email,
+      person.phone
+    );
+  };
 }

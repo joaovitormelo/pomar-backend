@@ -10,5 +10,10 @@ module.exports = (server, loginRouter: LoginRouter) => {
 
   router.post("/logout", new ExpressAdapter(loginRouter.logout).adapt);
 
+  router.post(
+    "/validateSession",
+    new ExpressAdapter(loginRouter.validateSession).adapt
+  );
+
   server.use("/", router);
 };

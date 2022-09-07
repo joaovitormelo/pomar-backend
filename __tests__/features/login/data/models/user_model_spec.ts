@@ -2,7 +2,7 @@ import { PersonModel } from "../../../../../src/features/login/data/models/perso
 import { UserModel } from "../../../../../src/features/login/data/models/user_model";
 
 describe("Test User model", () => {
-  describe("fromJSObject", () => {
+  describe("fromClient", () => {
     it("should return valid User model from JS object", () => {
       const tUserModel = new UserModel(
         1,
@@ -20,7 +20,7 @@ describe("Test User model", () => {
         phone: "phone_person",
       };
 
-      const userModel: UserModel = UserModel.fromJsObject(tJSObject);
+      const userModel: UserModel = UserModel.fromClient(tJSObject);
 
       expect(userModel).toBeInstanceOf(UserModel);
       expect(userModel.person).toBeInstanceOf(PersonModel);

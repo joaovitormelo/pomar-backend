@@ -1,8 +1,10 @@
 import { ConnectionError } from "../../../../../src/core/errors/errors";
+import { Session } from "../../../../../src/features/login/domain/entities/session";
 import { LoginRepositoryContract } from "../../../../../src/features/login/domain/repositories/login_repository_contract";
 import { Logout } from "../../../../../src/features/login/domain/usecases/logout";
 
 class MockLoginRepository implements LoginRepositoryContract {
+  getSessionById: (idSession: number) => Promise<Session>;
   getUserForLogin = jest.fn();
   saveSession = jest.fn();
   deleteSession = jest.fn();

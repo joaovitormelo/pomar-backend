@@ -4,6 +4,7 @@ import { Validator } from "../../core/utils/validator";
 import { LoginDatabaseSource } from "./data/datasources/login_database_source";
 import { LoginRepository } from "./data/repositories/login_repository";
 import DoLogin from "./domain/usecases/do_login";
+import { DoValidateSession } from "./domain/usecases/do_validate_session";
 import { Logout } from "./domain/usecases/logout";
 import { LoginRouter } from "./presentation/routers/login_router";
 import Timer from "./utils/timer";
@@ -28,10 +29,19 @@ export class LoginInitializer {
       timer
     );
     const logout = new Logout(loginRepository);
+    const doValidateSession = new DoValidateSession(
+      loginRepository,
+      tokenGenerator
+    );
 
     //Presentation
     const validator = new Validator();
-    const loginRouter = new LoginRouter(validator, doLogin, logout);
+    const loginRouter = new LoginRouter(
+      validator,
+      doLogin,
+      logout,
+      doValidateSession
+    );
 
     login(server, loginRouter);
   };

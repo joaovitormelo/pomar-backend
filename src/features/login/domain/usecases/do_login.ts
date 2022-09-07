@@ -56,7 +56,8 @@ export default class DoLogin {
       const timeNow = this.timer.getTimeNow();
       user.password = "";
       const session = new Session(1, user, token, timeNow);
-      this.loginRepository.saveSession(session);
+      const idSession = await this.loginRepository.saveSession(session);
+      session.idSession = idSession;
       return session;
     }
   }

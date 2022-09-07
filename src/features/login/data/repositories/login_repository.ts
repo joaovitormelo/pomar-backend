@@ -1,5 +1,7 @@
 import { ConnectionError } from "../../../../core/errors/errors";
+import { Person } from "../../domain/entities/person";
 import { Session } from "../../domain/entities/session";
+import { User } from "../../domain/entities/user";
 import { LoginRepositoryContract } from "../../domain/repositories/login_repository_contract";
 import { LoginDatabaseSourceContract } from "../datasources/login_database_source";
 import { SessionModel } from "../models/session_model";
@@ -16,10 +18,14 @@ export class LoginRepository implements LoginRepositoryContract {
   };
 
   saveSession = async (session: Session) => {
-    await this.loginDatabaseSource.saveSession(session as SessionModel);
+    return await this.loginDatabaseSource.saveSession(session as SessionModel);
   };
 
   deleteSession = async (idSession: number) => {
     await this.loginDatabaseSource.deleteSession(idSession);
+  };
+
+  getSessionById = async (idSession: number) => {
+    return await this.loginDatabaseSource.getSessionById(idSession);
   };
 }

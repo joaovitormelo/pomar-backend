@@ -32,17 +32,21 @@ export class UserModel extends User implements MyModel {
     );
   };
 
-  static fromJsObject = (JSObject: any) => {
+  static fromDatabase = (user: any) => {
     return new UserModel(
-      JSObject.id_user,
-      new PersonModel(
-        JSObject.id_person,
-        JSObject.name,
-        JSObject.email,
-        JSObject.phone
-      ),
-      JSObject.password,
-      JSObject.type_user
+      user.id_user,
+      PersonModel.fromDatabase(user),
+      user.password,
+      user.type_user
+    );
+  };
+
+  static fromClient = (user: any) => {
+    return new UserModel(
+      user.id_user,
+      PersonModel.fromClient(user.person),
+      user.password,
+      user.type_user
     );
   };
 }
