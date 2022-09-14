@@ -1,32 +1,37 @@
-import { InvalidSessionError } from "../../../../core/errors/errors";
-import { TokenGenerator } from "../../utils/token_generator";
+import {
+  ConnectionError,
+  InvalidSessionError,
+} from "../../../../core/errors/errors";
+import {
+  TokenGenerator,
+  TokenGeneratorContract,
+} from "../../utils/token_generator";
 import { Session } from "../entities/session";
 import { LoginRepositoryContract } from "../repositories/login_repository_contract";
 
 export class DoValidateSession {
   loginRepository: LoginRepositoryContract;
-  tokenGenerator: TokenGenerator;
+  tokenGenerator: TokenGeneratorContract;
 
   constructor(
     loginRepository: LoginRepositoryContract,
-    tokenGenerator: TokenGenerator
+    tokenGenerator: TokenGeneratorContract
   ) {
     this.loginRepository = loginRepository;
     this.tokenGenerator = tokenGenerator;
   }
 
-  execute = async (session: Session) => {
-    const isValidToken = await this.tokenGenerator.verifyJWTToken(
-      session.JWTToken
-    );
-    if (isValidToken) {
-      var sessionInDatabase: Session =
-        await this.loginRepository.getSessionById(session.idSession);
-      if (sessionInDatabase.JWTToken != session.JWTToken) {
+  execute = async (jwtToken: string) => {
+    try {
+      const validToken = await this.tokenGenerator.verifyJWTToken(jwtToken);
+      if (validToken) {
+        await this.loginRepository.getSessionByToken(jwtToken);
+      } else {
         throw new InvalidSessionError();
       }
-    } else {
-      throw new InvalidSessionError();
+    } catch (e) {
+      if (e instanceof ConnectionError) throw e;
+      else throw new InvalidSessionError();
     }
   };
 }

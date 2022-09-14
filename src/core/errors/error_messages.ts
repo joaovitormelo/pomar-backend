@@ -1,4 +1,4 @@
-import { HttpResponse } from "../../features/login/presentation/routers/login_router";
+import { HttpResponse } from "../presentation/routers/http_response";
 import {
   AuthenticationError,
   ConnectionError,
@@ -22,6 +22,11 @@ export class ErrorMessages {
     status: 400,
     msg: "Invalid value",
     code: "003",
+  };
+  static infoMissingHeader = {
+    status: 400,
+    msg: "Missing header",
+    code: "004",
   };
 
   static infoAuthenticationError = {
@@ -58,6 +63,7 @@ export class ErrorMessages {
   };
 
   static mapErrorToHttpResponse(e) {
+    console.log("Error Dealt");
     console.log(e);
 
     if (e instanceof ConnectionError) {

@@ -1,19 +1,23 @@
 import { ExpressAdapter } from "../../../../core/adapters/express_adapter";
 import { LoginRouter } from "../routers/login_router";
-
 const express = require("express");
 
-module.exports = (server, loginRouter: LoginRouter) => {
-  const router = express.Router();
+export class LoginApi {
+  server;
+  loginRouter: LoginRouter;
 
-  router.post("/login", new ExpressAdapter(loginRouter.login).adapt);
+  constructor(server, loginRouter: LoginRouter) {
+    this.server = server;
+    this.loginRouter = loginRouter;
+  }
 
-  router.post("/logout", new ExpressAdapter(loginRouter.logout).adapt);
+  start() {
+    const router = express.Router();
 
-  router.post(
-    "/validateSession",
-    new ExpressAdapter(loginRouter.validateSession).adapt
-  );
+    router.post("/login", new ExpressAdapter(this.loginRouter.login).adapt);
 
-  server.use("/", router);
-};
+    router.post("/logout", new ExpressAdapter(this.loginRouter.logout).adapt);
+
+    this.server.use("/", router);
+  }
+}

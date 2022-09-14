@@ -7,7 +7,7 @@ CREATE TABLE person(
 
 CREATE TABLE "user"(
 	id_user SERIAL PRIMARY KEY,
-	id_person INT, 
+	id_person INT,
 	"password" VARCHAR(45),
 	type_user INT,
 	CONSTRAINT fk_person
@@ -17,10 +17,18 @@ CREATE TABLE "user"(
 
 CREATE TABLE "session"(
 	id_session SERIAL PRIMARY KEY,
-	id_user INT, 
+	id_user INT,
 	jwt_token VARCHAR(300),
 	login_time TIMESTAMPTZ,
 	CONSTRAINT fk_user
 		FOREIGN KEY(id_user)
 			REFERENCES "user"(id_user)
+);
+
+CREATE TABLE "employee"(
+	id_employee SERIAL PRIMARY KEY,
+	id_person INT,
+	CONSTRAINT fk_person
+		FOREIGN KEY(id_person)
+			REFERENCES "person"(id_person)
 );

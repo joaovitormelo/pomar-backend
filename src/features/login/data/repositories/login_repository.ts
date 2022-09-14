@@ -25,7 +25,7 @@ export class LoginRepository implements LoginRepositoryContract {
     await this.loginDatabaseSource.deleteSession(idSession);
   };
 
-  getSessionById = async (idSession: number) => {
-    return await this.loginDatabaseSource.getSessionById(idSession);
+  getSessionByToken = async (jwtToken: string) => {
+    return await this.loginDatabaseSource.getSessionByToken(jwtToken);
   };
 }

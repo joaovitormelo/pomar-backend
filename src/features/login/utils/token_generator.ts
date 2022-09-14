@@ -9,12 +9,12 @@ export class TokenGeneratorParams {
 
   constructor(idUser: number, email: string) {
     this.idUser = idUser;
-    this.email = email;
   }
 }
 
 export interface TokenGeneratorContract {
   generateJWTToken: (params: TokenGeneratorParams) => Promise<string>;
+  verifyJWTToken: (token: string) => Promise<any>;
 }
 
 export class TokenGenerator implements TokenGeneratorContract {
@@ -32,7 +32,7 @@ export class TokenGenerator implements TokenGeneratorContract {
     });
   };
 
-  verifyJWTToken = async (token: String) => {
+  verifyJWTToken = async (token: string) => {
     return await new Promise<string>((resolve, reject) => {
       const callback = (err, decoded) => {
         if (err) throw new InvalidSessionError();

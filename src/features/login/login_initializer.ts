@@ -6,43 +6,53 @@ import { LoginRepository } from "./data/repositories/login_repository";
 import DoLogin from "./domain/usecases/do_login";
 import { DoValidateSession } from "./domain/usecases/do_validate_session";
 import { Logout } from "./domain/usecases/logout";
+import { LoginApi } from "./presentation/api/login_api";
 import { LoginRouter } from "./presentation/routers/login_router";
 import Timer from "./utils/timer";
 import { TokenGenerator } from "./utils/token_generator";
 
-const login = require("./presentation/api/login_api");
-
 export class LoginInitializer {
-  init = (server, pgClient: Client) => {
-    //Data
-    const loginDatabaseSource = new LoginDatabaseSource(pgClient);
-    const loginRepository = new LoginRepository(loginDatabaseSource);
+  server;
+  loginRepository: LoginRepository;
+  tokenGenerator: TokenGenerator;
+  doValidateSession: DoValidateSession;
+
+  constructor(
+    server,
+    loginRepository: LoginRepository,
+    tokenGenerator: TokenGenerator,
+    doValidateSession: DoValidateSession
+  ) {
+    this.server = server;
+    this.loginRepository = loginRepository;
+    this.tokenGenerator = tokenGenerator;
+    this.doValidateSession = doValidateSession;
+  }
+
+  init = () => {
     const encrypter = new Encrypter();
-    const tokenGenerator = new TokenGenerator();
     const timer = new Timer();
 
-    //Domain
     const doLogin = new DoLogin(
-      loginRepository,
+      this.loginRepository,
       encrypter,
-      tokenGenerator,
+      this.tokenGenerator,
       timer
     );
-    const logout = new Logout(loginRepository);
+    const logout = new Logout(this.loginRepository);
     const doValidateSession = new DoValidateSession(
-      loginRepository,
-      tokenGenerator
+      this.loginRepository,
+      this.tokenGenerator
     );
 
-    //Presentation
     const validator = new Validator();
     const loginRouter = new LoginRouter(
+      doValidateSession,
       validator,
       doLogin,
-      logout,
-      doValidateSession
+      logout
     );
 
-    login(server, loginRouter);
+    new LoginApi(this.server, loginRouter).start();
   };
 }

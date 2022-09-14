@@ -1,7 +1,5 @@
-import {
-  HttpRequest,
-  HttpResponse,
-} from "../../features/login/presentation/routers/login_router";
+import { HttpRequest } from "../presentation/routers/http_request";
+import { HttpResponse } from "../presentation/routers/http_response";
 
 export class ExpressAdapter {
   loginRouterFunc: (httpRequest: HttpRequest) => Promise<HttpResponse>;

@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import {
   ConnectionError,
+  InvalidSessionError,
   NoDataError,
   UserNotFoundError,
 } from "../../../../core/errors/errors";
@@ -12,7 +13,7 @@ export interface LoginDatabaseSourceContract {
   getUserForLogin: (email: string) => Promise<UserModel>;
   saveSession: (session: SessionModel) => Promise<number>;
   deleteSession: (idSession: number) => Promise<void>;
-  getSessionById: (idSession: number) => Promise<Session>;
+  getSessionByToken: (jwtToken: string) => Promise<Session>;
 }
 
 export class LoginDatabaseSource implements LoginDatabaseSourceContract {
@@ -60,11 +61,11 @@ export class LoginDatabaseSource implements LoginDatabaseSourceContract {
     }
   };
 
-  getSessionById = async (idSession: number) => {
+  getSessionByToken = async (jwtToken: string) => {
     try {
       const result = await this.client.query(
-        "SELECT * FROM p.session s INNER JOIN p.user u ON s.id_user = u.id_user INNER JOIN p.person pe ON u.id_person = pe.id_person WHERE s.id_session = $1",
-        [idSession]
+        "SELECT * FROM p.session s INNER JOIN p.user u ON s.id_user = u.id_user INNER JOIN p.person pe ON u.id_person = pe.id_person WHERE s.jwt_token = $1",
+        [jwtToken]
       );
       if (result.rowCount == 0) throw new NoDataError();
       return SessionModel.fromDatabase(result.rows[0]);
