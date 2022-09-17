@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 
 export interface EncrypterContract {
+  encryptPassword: (password: string) => Promise<string>;
   comparePassword: (password: string, passwordHash: string) => Promise<string>;
 }
 

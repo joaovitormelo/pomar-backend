@@ -1,4 +1,5 @@
 import { Client } from "pg";
+import { Encrypter } from "../../core/utils/encrypter";
 import { EmployeeInitializer } from "../../features/employee/presentation/employee_initializer";
 import { LoginDatabaseSource } from "../../features/login/data/datasources/login_database_source";
 import { LoginRepository } from "../../features/login/data/repositories/login_repository";
@@ -16,6 +17,7 @@ export class Initializer {
     const loginDatabaseSource: LoginDatabaseSource = new LoginDatabaseSource(
       pgClient
     );
+    const encrypter: Encrypter = new Encrypter();
 
     const loginRepository: LoginRepository = new LoginRepository(
       loginDatabaseSource
@@ -31,9 +33,15 @@ export class Initializer {
       server,
       loginRepository,
       tokenGenerator,
-      doValidateSession
+      doValidateSession,
+      encrypter
     ).init();
-    new EmployeeInitializer(server, pgClient, doValidateSession).init();
+    new EmployeeInitializer(
+      server,
+      pgClient,
+      doValidateSession,
+      encrypter
+    ).init();
 
     //Routes
     require("../routes/routes")(server);

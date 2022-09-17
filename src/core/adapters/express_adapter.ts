@@ -12,7 +12,7 @@ export class ExpressAdapter {
 
   adapt = async (req, res) => {
     const response: HttpResponse = await this.loginRouterFunc(
-      new HttpRequest(req.body, req.headers)
+      new HttpRequest(req.body, req.headers, req.params)
     );
     if (response.status != 200) {
       res.status(response.status).json(response.data);

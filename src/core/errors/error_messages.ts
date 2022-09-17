@@ -2,6 +2,7 @@ import { HttpResponse } from "../presentation/routers/http_response";
 import {
   AuthenticationError,
   ConnectionError,
+  ExistentEmailError,
   InvalidSessionError,
   NoDataError,
   UserNotFoundError,
@@ -62,6 +63,12 @@ export class ErrorMessages {
     code: "001",
   };
 
+  static infoExistentEmailError = {
+    status: 409,
+    msg: "Email already registered in database",
+    code: "001",
+  };
+
   static mapErrorToHttpResponse(e) {
     console.log("Error Dealt");
     console.log(e);
@@ -90,6 +97,11 @@ export class ErrorMessages {
       return new HttpResponse(ErrorMessages.infoNoDataError.status, {
         code: ErrorMessages.infoNoDataError.code,
         msg: ErrorMessages.infoNoDataError.msg,
+      });
+    } else if (e instanceof ExistentEmailError) {
+      return new HttpResponse(ErrorMessages.infoNoDataError.status, {
+        stat: ErrorMessages.infoExistentEmailError.code,
+        msg: ErrorMessages.infoExistentEmailError.msg,
       });
     } else {
       return new HttpResponse(ErrorMessages.infoUnknownError.status, {

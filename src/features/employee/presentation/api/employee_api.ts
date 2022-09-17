@@ -24,6 +24,16 @@ export class EmployeeApi {
       new ExpressAdapter(this.employeeRouter.createEmployees).adapt
     );
 
+    router.put(
+      "/employee",
+      new ExpressAdapter(this.employeeRouter.updateEmployee).adapt
+    );
+
+    router.delete(
+      "/employee/:idEmployee",
+      new ExpressAdapter(this.employeeRouter.deleteEmployee).adapt
+    );
+
     this.server.use("/", router);
   }
 }

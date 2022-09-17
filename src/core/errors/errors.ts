@@ -35,3 +35,9 @@ export class NoDataError extends Error {
     super(`There is no matching data`);
   }
 }
+
+export class ExistentEmailError extends Error {
+  constructor() {
+    super(`There is no matching data`);
+  }
+}

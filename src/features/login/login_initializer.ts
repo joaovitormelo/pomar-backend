@@ -16,26 +16,28 @@ export class LoginInitializer {
   loginRepository: LoginRepository;
   tokenGenerator: TokenGenerator;
   doValidateSession: DoValidateSession;
+  encrypter: Encrypter;
 
   constructor(
     server,
     loginRepository: LoginRepository,
     tokenGenerator: TokenGenerator,
-    doValidateSession: DoValidateSession
+    doValidateSession: DoValidateSession,
+    encrypter: Encrypter
   ) {
     this.server = server;
     this.loginRepository = loginRepository;
     this.tokenGenerator = tokenGenerator;
     this.doValidateSession = doValidateSession;
+    this.encrypter = encrypter;
   }
 
   init = () => {
-    const encrypter = new Encrypter();
     const timer = new Timer();
 
     const doLogin = new DoLogin(
       this.loginRepository,
-      encrypter,
+      this.encrypter,
       this.tokenGenerator,
       timer
     );
