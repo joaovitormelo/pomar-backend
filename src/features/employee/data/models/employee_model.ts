@@ -11,8 +11,8 @@ export class EmployeeModel extends Employee implements MyModel {
 
   toJSObject = () => {
     return {
-      idEmployee: this.idEmployee,
-      person: this.person,
+      id_employee: this.idEmployee,
+      person: this.person.toJSObject(),
     };
   };
 

@@ -96,7 +96,6 @@ export class EmployeeDatabaseSource implements EmployeeDatabaseSourceContract {
   };
 
   updatePerson = async (person: Person) => {
-    console.log(person);
     try {
       const result = await this.client.query(
         "UPDATE p.person SET name=$1, email=$2, phone=$3 WHERE id_person=$4",

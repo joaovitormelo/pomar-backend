@@ -2,7 +2,9 @@ import { ErrorMessages } from "../../../../core/errors/error_messages";
 import { HttpRequest } from "../../../../core/presentation/routers/http_request";
 import { HttpResponse } from "../../../../core/presentation/routers/http_response";
 import { SecuredRouter } from "../../../../core/presentation/routers/secured_router";
+import { PersonModel } from "../../../login/data/models/person_model";
 import { UserModel } from "../../../login/data/models/user_model";
+import { Person } from "../../../login/domain/entities/person";
 import { User } from "../../../login/domain/entities/user";
 import { DoValidateSession } from "../../../login/domain/usecases/do_validate_session";
 import { EmployeeModel } from "../../data/models/employee_model";
@@ -10,7 +12,10 @@ import { Employee } from "../../domain/entities/employee";
 import { DoCreateEmployee } from "../../domain/usecases/do_create_employee";
 import { DoDeleteEmployee } from "../../domain/usecases/do_delete_employee";
 import { DoReadEmployees } from "../../domain/usecases/do_read_employees";
-import { DoUpdateEmployee } from "../../domain/usecases/do_update_employee";
+import {
+  DoUpdateEmployee,
+  DoUpdateEmployeeParams,
+} from "../../domain/usecases/do_update_employee";
 
 export class EmployeeRouter extends SecuredRouter {
   doReadEmployees: DoReadEmployees;
@@ -110,47 +115,29 @@ export class EmployeeRouter extends SecuredRouter {
           code: ErrorMessages.infoNoBody.code,
           msg: ErrorMessages.infoNoBody.msg,
         });
-      } else if (
-        httpRequest.body.employee == null ||
-        httpRequest.body.employee == undefined
+      }
+      if (
+        httpRequest.body.person == null ||
+        httpRequest.body.person == undefined
       ) {
         return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
           code: ErrorMessages.infoMissingParameter.code,
           msg: ErrorMessages.infoMissingParameter.msg,
-          target: "employee",
-        });
-      } else if (
-        httpRequest.body.user == null ||
-        httpRequest.body.user == undefined
-      ) {
-        return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
-          code: ErrorMessages.infoMissingParameter.code,
-          msg: ErrorMessages.infoMissingParameter.msg,
-          target: "user",
+          target: "person",
         });
       }
-      var employee: Employee;
-      var user: User;
+      var person: Person;
       try {
-        employee = EmployeeModel.fromClient(httpRequest.body.employee);
+        person = PersonModel.fromClient(httpRequest.body.person);
       } catch {
         return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
           code: ErrorMessages.infoInvalidValue.code,
           msg: ErrorMessages.infoInvalidValue.msg,
-          target: "employee",
+          target: "person",
         });
       }
       try {
-        user = UserModel.fromClient(httpRequest.body.user);
-      } catch {
-        return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
-          code: ErrorMessages.infoInvalidValue.code,
-          msg: ErrorMessages.infoInvalidValue.msg,
-          target: "user",
-        });
-      }
-      try {
-        await this.doUpdateEmployee.execute(employee, user);
+        await this.doUpdateEmployee.execute(new DoUpdateEmployeeParams(person));
         return new HttpResponse(200);
       } catch (e) {
         return ErrorMessages.mapErrorToHttpResponse(e);

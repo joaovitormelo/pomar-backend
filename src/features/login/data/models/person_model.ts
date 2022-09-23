@@ -4,7 +4,7 @@ import { MyModel } from "./my_model";
 export class PersonModel extends Person implements MyModel {
   toJSObject = () => {
     return {
-      idPerson: this.idPerson,
+      id_person: this.idPerson,
       name: this.name,
       email: this.email,
       phone: this.phone,

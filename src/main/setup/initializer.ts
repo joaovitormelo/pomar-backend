@@ -6,6 +6,7 @@ import { LoginRepository } from "../../features/login/data/repositories/login_re
 import { DoValidateSession } from "../../features/login/domain/usecases/do_validate_session";
 import { LoginInitializer } from "../../features/login/login_initializer";
 import { TokenGenerator } from "../../features/login/utils/token_generator";
+import { ScheduleInitializer } from "../../features/schedule/schedule_initializer";
 
 const server = require("./server");
 const client = require("./database");
@@ -42,6 +43,7 @@ export class Initializer {
       doValidateSession,
       encrypter
     ).init();
+    new ScheduleInitializer(server, pgClient, doValidateSession).init();
 
     //Routes
     require("../routes/routes")(server);
