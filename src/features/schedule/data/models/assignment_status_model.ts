@@ -1,16 +1,16 @@
-export class AssignmentStatusModel {
-  idAssignmentStatus: number;
+export class AssignmentModel {
+  idAssignment: number;
   idEvent: number;
   idEmployee: number;
   isCompleted: boolean;
 
   constructor(
-    idAssignmentStatus: number,
+    idAssignment: number,
     idEvent: number,
     idEmployee: number,
     isCompleted: boolean
   ) {
-    this.idAssignmentStatus = idAssignmentStatus;
+    this.idAssignment = idAssignment;
     this.idEvent = idEvent;
     this.idEmployee = idEmployee;
     this.isCompleted = isCompleted;
@@ -18,28 +18,28 @@ export class AssignmentStatusModel {
 
   toJSObject() {
     return {
-      id_assignment_status: this.idAssignmentStatus,
+      id_assignment: this.idAssignment,
       id_event: this.idEvent,
       id_employee: this.idEmployee,
       is_completed: this.isCompleted,
     };
   }
 
-  static fromDatabase(assignmentStatus: any) {
-    return new AssignmentStatusModel(
-      assignmentStatus.id_assignment_status,
-      assignmentStatus.id_event,
-      assignmentStatus.id_employee,
-      assignmentStatus.is_completed
+  static fromDatabase(assignment: any) {
+    return new AssignmentModel(
+      assignment.id_assignment,
+      assignment.id_event,
+      assignment.id_employee,
+      assignment.is_completed
     );
   }
 
-  static fromClient(assignmentStatus: any) {
-    return new AssignmentStatusModel(
-      assignmentStatus.id_assignment_status,
-      assignmentStatus.id_event,
-      assignmentStatus.id_employee,
-      assignmentStatus.is_completed
+  static fromClient(assignment: any) {
+    return new AssignmentModel(
+      assignment.id_assignment,
+      assignment.id_event,
+      assignment.id_employee,
+      assignment.is_completed
     );
   }
 }

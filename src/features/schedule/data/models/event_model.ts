@@ -14,7 +14,7 @@ export class EventModel {
   toJSObject() {
     return {
       id_event: this.idEvent,
-      event_info: this.eventInfo,
+      event_info: this.eventInfo.toJSObject(),
       date: this.date,
     };
   }

@@ -4,7 +4,10 @@ import { HttpResponse } from "../../../../core/presentation/routers/http_respons
 import { SecuredRouter } from "../../../../core/presentation/routers/secured_router";
 import { DoValidateSession } from "../../../login/domain/usecases/do_validate_session";
 import { EventModel } from "../../data/models/event_model";
-import { DoReadEvents } from "../../domain/usecases/do_read_events";
+import {
+  DoReadEvents,
+  ReadEventsData,
+} from "../../domain/usecases/do_read_events";
 
 export class ScheduleRouter extends SecuredRouter {
   doValidateSession: DoValidateSession;
@@ -21,11 +24,26 @@ export class ScheduleRouter extends SecuredRouter {
   readEvents = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
       try {
-        const eventList: Array<EventModel> = await this.doReadEvents.execute();
-        const eventListJson = eventList.map((event: EventModel) =>
-          event.toJSObject()
-        );
-        return new HttpResponse(200, eventListJson);
+        const readEventsDataList: Array<ReadEventsData> =
+          await this.doReadEvents.execute();
+        var readEventsDataListJson = [];
+        if (readEventsDataList.length > 0) {
+          readEventsDataListJson = readEventsDataList.map(
+            (readEventsData: ReadEventsData) => {
+              var assignmentListJson = [];
+              if (readEventsData.assignments.length > 0) {
+                assignmentListJson = readEventsData.assignments.map(
+                  (assignment) => assignment.toJSObject()
+                );
+              }
+              return {
+                event: readEventsData.event.toJSObject(),
+                assignments: assignmentListJson,
+              };
+            }
+          );
+        }
+        return new HttpResponse(200, readEventsDataListJson);
       } catch (e) {
         return ErrorMessages.mapErrorToHttpResponse(e);
       }
