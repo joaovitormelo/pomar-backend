@@ -20,6 +20,11 @@ export class ScheduleApi {
       new ExpressAdapter(this.scheduleRouter.readEvents).adapt
     );
 
+    router.post(
+      "/event",
+      new ExpressAdapter(this.scheduleRouter.addEvent).adapt
+    );
+
     this.server.use("/", router);
   }
 }

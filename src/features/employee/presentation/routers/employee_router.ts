@@ -2,6 +2,7 @@ import { ErrorMessages } from "../../../../core/errors/error_messages";
 import { HttpRequest } from "../../../../core/presentation/routers/http_request";
 import { HttpResponse } from "../../../../core/presentation/routers/http_response";
 import { SecuredRouter } from "../../../../core/presentation/routers/secured_router";
+import { ValidateBody } from "../../../../core/presentation/routers/validate_body";
 import { PersonModel } from "../../../login/data/models/person_model";
 import { UserModel } from "../../../login/data/models/user_model";
 import { Person } from "../../../login/domain/entities/person";
@@ -55,93 +56,67 @@ export class EmployeeRouter extends SecuredRouter {
 
   createEmployees = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      if (!httpRequest.body) {
-        return new HttpResponse(ErrorMessages.infoNoBody.status, {
-          code: ErrorMessages.infoNoBody.code,
-          msg: ErrorMessages.infoNoBody.msg,
-        });
-      } else if (
-        httpRequest.body.employee == null ||
-        httpRequest.body.employee == undefined
-      ) {
-        return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
-          code: ErrorMessages.infoMissingParameter.code,
-          msg: ErrorMessages.infoMissingParameter.msg,
-          target: "employee",
-        });
-      } else if (
-        httpRequest.body.user == null ||
-        httpRequest.body.user == undefined
-      ) {
-        return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
-          code: ErrorMessages.infoMissingParameter.code,
-          msg: ErrorMessages.infoMissingParameter.msg,
-          target: "user",
-        });
-      }
-      var employee: Employee;
-      var user: User;
-      try {
-        employee = EmployeeModel.fromClient(httpRequest.body.employee);
-      } catch {
-        return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
-          code: ErrorMessages.infoInvalidValue.code,
-          msg: ErrorMessages.infoInvalidValue.msg,
-          target: "employee",
-        });
-      }
-      try {
-        user = UserModel.fromClient(httpRequest.body.user);
-      } catch {
-        return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
-          code: ErrorMessages.infoInvalidValue.code,
-          msg: ErrorMessages.infoInvalidValue.msg,
-          target: "user",
-        });
-      }
-      try {
-        await this.doCreateEmployee.execute(employee, user);
-        return new HttpResponse(200);
-      } catch (e) {
-        return ErrorMessages.mapErrorToHttpResponse(e);
-      }
+      return await new ValidateBody().validate(
+        httpRequest,
+        ["employee", "user"],
+        async () => {
+          var employee: Employee;
+          var user: User;
+          try {
+            employee = EmployeeModel.fromClient(httpRequest.body.employee);
+          } catch {
+            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+              code: ErrorMessages.infoInvalidValue.code,
+              msg: ErrorMessages.infoInvalidValue.msg,
+              target: "employee",
+            });
+          }
+          try {
+            user = UserModel.fromClient(httpRequest.body.user);
+          } catch {
+            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+              code: ErrorMessages.infoInvalidValue.code,
+              msg: ErrorMessages.infoInvalidValue.msg,
+              target: "user",
+            });
+          }
+          try {
+            await this.doCreateEmployee.execute(employee, user);
+            return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
     });
   };
 
   updateEmployee = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      if (!httpRequest.body) {
-        return new HttpResponse(ErrorMessages.infoNoBody.status, {
-          code: ErrorMessages.infoNoBody.code,
-          msg: ErrorMessages.infoNoBody.msg,
-        });
-      }
-      if (
-        httpRequest.body.person == null ||
-        httpRequest.body.person == undefined
-      ) {
-        return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
-          code: ErrorMessages.infoMissingParameter.code,
-          msg: ErrorMessages.infoMissingParameter.msg,
-          target: "person",
-        });
-      }
-      var person: Person;
-      try {
-        person = PersonModel.fromClient(httpRequest.body.person);
-      } catch {
-        return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
-          code: ErrorMessages.infoInvalidValue.code,
-          msg: ErrorMessages.infoInvalidValue.msg,
-          target: "person",
-        });
-      }
-      try {
-        await this.doUpdateEmployee.execute(new DoUpdateEmployeeParams(person));
-        return new HttpResponse(200);
-      } catch (e) {
-        return ErrorMessages.mapErrorToHttpResponse(e);
-      }
+      return await new ValidateBody().validate(
+        httpRequest,
+        ["person"],
+        async () => {
+          var person: Person;
+          try {
+            person = PersonModel.fromClient(httpRequest.body.person);
+          } catch {
+            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+              code: ErrorMessages.infoInvalidValue.code,
+              msg: ErrorMessages.infoInvalidValue.msg,
+              target: "person",
+            });
+          }
+          try {
+            await this.doUpdateEmployee.execute(
+              new DoUpdateEmployeeParams(person)
+            );
+            return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
     });
   };
 
