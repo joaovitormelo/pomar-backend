@@ -8,6 +8,10 @@ import { AssignmentModel } from "../../data/models/assignment_status_model";
 import { EventModel } from "../../data/models/event_model";
 import { AddEventParams, DoAddEvent } from "../../domain/usecases/do_add_event";
 import {
+  DoEditEvent,
+  EditEventParams,
+} from "../../domain/usecases/do_edit_event";
+import {
   DoReadEvents,
   ReadEventsData,
 } from "../../domain/usecases/do_read_events";
@@ -16,15 +20,18 @@ export class ScheduleRouter extends SecuredRouter {
   doValidateSession: DoValidateSession;
   doReadEvents: DoReadEvents;
   doAddEvent: DoAddEvent;
+  doEditEvent: DoEditEvent;
 
   constructor(
     doValidateSession: DoValidateSession,
     doReadEvents: DoReadEvents,
-    doAddEvent: DoAddEvent
+    doAddEvent: DoAddEvent,
+    doEditEvent: DoEditEvent
   ) {
     super(doValidateSession);
     this.doReadEvents = doReadEvents;
     this.doAddEvent = doAddEvent;
+    this.doEditEvent = doEditEvent;
   }
 
   readEvents = async (httpRequest: HttpRequest) => {
@@ -92,6 +99,52 @@ export class ScheduleRouter extends SecuredRouter {
           try {
             await this.doAddEvent.execute(
               new AddEventParams(event, assignmentList)
+            );
+            return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
+    });
+  };
+
+  editEvent = async (httpRequest: HttpRequest) => {
+    return await this.validateToken(httpRequest, async () => {
+      return await new ValidateBody().validate(
+        httpRequest,
+        ["event", "assignment_list"],
+        async () => {
+          var event: EventModel;
+          var assignmentList: Array<AssignmentModel> = [];
+          try {
+            event = EventModel.fromClient(httpRequest.body.event);
+          } catch (e) {
+            console.log(e);
+            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+              code: ErrorMessages.infoInvalidValue.code,
+              msg: ErrorMessages.infoInvalidValue.msg,
+              target: "event",
+            });
+          }
+          try {
+            for (var i in httpRequest.body.assignment_list) {
+              const assignment: AssignmentModel = AssignmentModel.fromClient(
+                httpRequest.body.assignment_list[i]
+              );
+              assignmentList.push(assignment);
+            }
+          } catch (e) {
+            console.log(e);
+            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+              code: ErrorMessages.infoInvalidValue.code,
+              msg: ErrorMessages.infoInvalidValue.msg,
+              target: "assignment_list",
+            });
+          }
+          try {
+            await this.doEditEvent.execute(
+              new EditEventParams(event, assignmentList)
             );
             return new HttpResponse(200);
           } catch (e) {

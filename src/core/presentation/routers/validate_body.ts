@@ -5,6 +5,7 @@ import { HttpResponse } from "./http_response";
 export class ValidateBody {
   async validate(httpRequest: HttpRequest, properties: Array<string>, body) {
     if (!httpRequest.body) {
+      console.log("Missing body");
       return new HttpResponse(ErrorMessages.infoNoBody.status, {
         code: ErrorMessages.infoNoBody.code,
         msg: ErrorMessages.infoNoBody.msg,
@@ -16,6 +17,7 @@ export class ValidateBody {
         httpRequest.body[prop] == null ||
         httpRequest.body[prop] == undefined
       ) {
+        console.log(`Missing ${prop}`);
         return new HttpResponse(ErrorMessages.infoMissingParameter.status, {
           code: ErrorMessages.infoMissingParameter.code,
           msg: ErrorMessages.infoMissingParameter.msg,

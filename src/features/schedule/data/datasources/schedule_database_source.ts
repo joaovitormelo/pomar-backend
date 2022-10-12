@@ -101,4 +101,59 @@ export class ScheduleDatabaseSource {
       throw new ConnectionError();
     }
   };
+
+  editEventInfo = async (eventInfo: EventInfoModel) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "UPDATE p.event_info SET title = $1, init_time = $2, end_time = $3, all_day = $4, description = $5, is_task = $6, is_collective = $7, is_routine = $8, init_date = $9, frequency = $10, interval = $11, week_days = $12, end_date = $13, times = $14 WHERE id_event_info = $15",
+        [
+          eventInfo.title,
+          eventInfo.initTime,
+          eventInfo.endTime,
+          eventInfo.allDay,
+          eventInfo.description,
+          eventInfo.isTask,
+          eventInfo.isCollective,
+          eventInfo.isRoutine,
+          eventInfo.initDate,
+          eventInfo.frequency,
+          eventInfo.interval,
+          eventInfo.weekDays,
+          eventInfo.endDate,
+          eventInfo.times,
+          eventInfo.idEventInfo,
+        ]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  editEvent = async (event: EventModel) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "UPDATE p.event SET date = $1 WHERE id_event = $2",
+        [event.date, event.idEvent]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  deleteAssignmentsByEventId = async (idEvent: number) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "DELETE FROM p.assignment WHERE id_event = $1",
+        [idEvent]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
 }
