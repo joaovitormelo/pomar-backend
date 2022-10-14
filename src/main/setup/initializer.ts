@@ -7,6 +7,7 @@ import { DoValidateSession } from "../../features/login/domain/usecases/do_valid
 import { LoginInitializer } from "../../features/login/login_initializer";
 import { TokenGenerator } from "../../features/login/utils/token_generator";
 import { ScheduleInitializer } from "../../features/schedule/schedule_initializer";
+import { WhatsAppInitializer } from "../../features/whatsapp/setup/whatsapp_initializer";
 
 const server = require("./server");
 const client = require("./database");
@@ -43,6 +44,7 @@ export class Initializer {
       doValidateSession,
       encrypter
     ).init();
+    new WhatsAppInitializer().init();
     new ScheduleInitializer(server, pgClient, doValidateSession).init();
 
     //Routes
