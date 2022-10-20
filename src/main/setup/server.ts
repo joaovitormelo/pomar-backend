@@ -17,4 +17,4 @@ server.use(bodyParser.json());
 
 const serverInstance = server.listen(process.env.PORT, () => {});
 
-module.exports = server;
+module.exports = { server, serverInstance };

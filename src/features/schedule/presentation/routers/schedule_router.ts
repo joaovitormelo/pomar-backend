@@ -65,7 +65,7 @@ export class ScheduleRouter extends SecuredRouter {
 
   addEvent = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      return await new ValidateBody().validate(
+      return await ValidateBody.validate(
         httpRequest,
         ["event", "assignment_list"],
         async () => {
@@ -111,7 +111,7 @@ export class ScheduleRouter extends SecuredRouter {
 
   editEvent = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      return await new ValidateBody().validate(
+      return await ValidateBody.validate(
         httpRequest,
         ["event", "assignment_list"],
         async () => {

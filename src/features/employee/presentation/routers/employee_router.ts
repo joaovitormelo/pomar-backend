@@ -56,7 +56,7 @@ export class EmployeeRouter extends SecuredRouter {
 
   createEmployees = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      return await new ValidateBody().validate(
+      return await ValidateBody.validate(
         httpRequest,
         ["employee", "user"],
         async () => {
@@ -93,30 +93,26 @@ export class EmployeeRouter extends SecuredRouter {
 
   updateEmployee = async (httpRequest: HttpRequest) => {
     return await this.validateToken(httpRequest, async () => {
-      return await new ValidateBody().validate(
-        httpRequest,
-        ["person"],
-        async () => {
-          var person: Person;
-          try {
-            person = PersonModel.fromClient(httpRequest.body.person);
-          } catch {
-            return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
-              code: ErrorMessages.infoInvalidValue.code,
-              msg: ErrorMessages.infoInvalidValue.msg,
-              target: "person",
-            });
-          }
-          try {
-            await this.doUpdateEmployee.execute(
-              new DoUpdateEmployeeParams(person)
-            );
-            return new HttpResponse(200);
-          } catch (e) {
-            return ErrorMessages.mapErrorToHttpResponse(e);
-          }
+      return await ValidateBody.validate(httpRequest, ["person"], async () => {
+        var person: Person;
+        try {
+          person = PersonModel.fromClient(httpRequest.body.person);
+        } catch {
+          return new HttpResponse(ErrorMessages.infoInvalidValue.status, {
+            code: ErrorMessages.infoInvalidValue.code,
+            msg: ErrorMessages.infoInvalidValue.msg,
+            target: "person",
+          });
         }
-      );
+        try {
+          await this.doUpdateEmployee.execute(
+            new DoUpdateEmployeeParams(person)
+          );
+          return new HttpResponse(200);
+        } catch (e) {
+          return ErrorMessages.mapErrorToHttpResponse(e);
+        }
+      });
     });
   };
 

@@ -1,18 +1,26 @@
 import { Client, LocalAuth } from "whatsapp-web.js";
+import { WebSocketServer } from "../../../../core/config/web_socket_server";
 const rimraf = require("rimraf");
 
 export class WhatsAppConnection {
+  wsServer: WebSocketServer;
   client: Client;
   qrCode: string;
   isDisconnecting: boolean = false;
 
+  constructor(wsServer: WebSocketServer) {
+    this.wsServer = wsServer;
+  }
+
   onQr = (qr) => {
     console.log("WhatsApp QR Code generated");
     this.qrCode = qr;
+    this.wsServer.wss.broadcast({ qr: qr });
   };
 
   onReady = (qr) => {
     console.log("WhatsApp client is ready!");
+    this.wsServer.wss.broadcast({ ready: true });
   };
 
   onDisconnected = async () => {
@@ -23,6 +31,7 @@ export class WhatsAppConnection {
       //
     }
     console.log("WhatsApp client disconnected!");
+    this.wsServer.wss.broadcast({ disconnected: true });
     this.reconnectClient();
   };
 

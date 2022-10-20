@@ -3,7 +3,11 @@ import { HttpRequest } from "./http_request";
 import { HttpResponse } from "./http_response";
 
 export class ValidateBody {
-  async validate(httpRequest: HttpRequest, properties: Array<string>, body) {
+  static async validate(
+    httpRequest: HttpRequest,
+    properties: Array<string>,
+    body
+  ) {
     if (!httpRequest.body) {
       console.log("Missing body");
       return new HttpResponse(ErrorMessages.infoNoBody.status, {
