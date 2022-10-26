@@ -12,6 +12,7 @@ export class EventInfoModel {
   frequency: string;
   interval: number;
   weekDays: string;
+  undefinedEnd: boolean;
   endDate: string;
   times: number;
 
@@ -29,6 +30,7 @@ export class EventInfoModel {
     frequency: string,
     interval: number,
     weekDays: string,
+    undefinedEnd: boolean,
     endDate: string,
     times: number
   ) {
@@ -45,6 +47,7 @@ export class EventInfoModel {
     this.frequency = frequency;
     this.interval = interval;
     this.weekDays = weekDays;
+    this.undefinedEnd = undefinedEnd;
     this.endDate = endDate;
     this.times = times;
   }
@@ -63,6 +66,7 @@ export class EventInfoModel {
       frequency: this.frequency,
       interval: this.interval,
       week_days: this.weekDays,
+      undefined_end: this.undefinedEnd,
       end_date: this.endDate,
       times: this.times,
     };
@@ -83,6 +87,7 @@ export class EventInfoModel {
       eventInfo.frequency,
       eventInfo.interval,
       eventInfo.week_days,
+      eventInfo.undefined_end,
       eventInfo.end_date,
       eventInfo.times
     );
@@ -103,6 +108,7 @@ export class EventInfoModel {
       eventInfo.frequency,
       eventInfo.interval,
       eventInfo.week_days,
+      eventInfo.undefined_end,
       eventInfo.end_date,
       eventInfo.times
     );

@@ -24,6 +24,11 @@ export class WhatsAppApi {
       new ExpressAdapter(this.whatsAppRouter.disconnect).adapt
     );
 
+    router.post(
+      "/whatsapp/send",
+      new ExpressAdapter(this.whatsAppRouter.send).adapt
+    );
+
     this.server.use("/", router);
   }
 }

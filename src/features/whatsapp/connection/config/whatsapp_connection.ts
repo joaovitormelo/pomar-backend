@@ -1,4 +1,8 @@
-import { Client, LocalAuth } from "whatsapp-web.js";
+import WAWebJS, {
+  Client,
+  LocalAuth,
+  MessageSendOptions,
+} from "whatsapp-web.js";
 import { WebSocketServer } from "../../../../core/config/web_socket_server";
 const rimraf = require("rimraf");
 
@@ -12,18 +16,18 @@ export class WhatsAppConnection {
     this.wsServer = wsServer;
   }
 
-  onQr = (qr) => {
+  private onQr = (qr) => {
     console.log("WhatsApp QR Code generated");
     this.qrCode = qr;
     this.wsServer.wss.broadcast({ qr: qr });
   };
 
-  onReady = (qr) => {
+  private onReady = (qr) => {
     console.log("WhatsApp client is ready!");
     this.wsServer.wss.broadcast({ ready: true });
   };
 
-  onDisconnected = async () => {
+  private onDisconnected = async () => {
     this.isDisconnecting = true;
     try {
       this.client.destroy();
@@ -35,7 +39,7 @@ export class WhatsAppConnection {
     this.reconnectClient();
   };
 
-  initializeClient = () => {
+  private initializeClient = () => {
     console.log("Initializing new WhatsApp Client...");
     this.client = new Client({
       authStrategy: new LocalAuth(),
@@ -52,7 +56,7 @@ export class WhatsAppConnection {
     this.client.initialize();
   };
 
-  deleteFolder = async () => {
+  private deleteFolder = async () => {
     return await new Promise((resolve, reject) => {
       rimraf("./.wwebjs_auth", () => {
         resolve(true);
@@ -60,7 +64,7 @@ export class WhatsAppConnection {
     });
   };
 
-  reconnectClient = async () => {
+  private reconnectClient = async () => {
     await this.deleteFolder();
     this.qrCode = null;
     setTimeout(() => {
@@ -70,6 +74,18 @@ export class WhatsAppConnection {
       }, 250);
     }, 2750);
   };
+
+  async sendMessage(phone, msg) {
+    const phoneWithCountryCode = `55${phone}`;
+    const numberDetails = await this.client.getNumberId(phoneWithCountryCode);
+    if (numberDetails) {
+      await this.client.sendMessage(numberDetails._serialized, msg, {
+        linkPreview: true,
+      });
+    } else {
+      throw new Error(`${phoneWithCountryCode} - Número sem WhatsApp`);
+    }
+  }
 
   init() {
     this.initializeClient();
