@@ -1,8 +1,8 @@
 import { Client } from "pg";
 import { ConnectionError, NoDataError } from "../../../../core/errors/errors";
-import { AssignmentModel } from "../models/assignment_status_model";
-import { EventInfoModel } from "../models/event_info_model";
+import { AssignmentModel } from "../models/assignment_model";
 import { EventModel } from "../models/event_model";
+import { RoutineExclusionModel } from "../models/routine_exclusion_model";
 
 export class ScheduleDatabaseSource {
   client: Client;
@@ -14,9 +14,7 @@ export class ScheduleDatabaseSource {
   readEvents = async () => {
     var response;
     try {
-      response = await this.client.query(
-        "SELECT * FROM p.event e INNER JOIN p.event_info ei ON e.id_event_info = ei.id_event_info"
-      );
+      response = await this.client.query("SELECT * FROM p.event");
     } catch (e) {
       console.error(e);
       throw new ConnectionError();
@@ -46,42 +44,29 @@ export class ScheduleDatabaseSource {
     return eventList;
   };
 
-  addEventInfo = async (eventInfo: EventInfoModel) => {
-    var response;
-    try {
-      response = await this.client.query(
-        "INSERT INTO p.event_info(title, init_time, end_time, all_day, description, is_task, is_collective, is_routine, init_date, frequency, interval, week_days, undefined_end, end_date, times) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id_event_info",
-        [
-          eventInfo.title,
-          eventInfo.initTime,
-          eventInfo.endTime,
-          eventInfo.allDay,
-          eventInfo.description,
-          eventInfo.isTask,
-          eventInfo.isCollective,
-          eventInfo.isRoutine,
-          eventInfo.initDate,
-          eventInfo.frequency,
-          eventInfo.interval,
-          eventInfo.weekDays,
-          eventInfo.undefinedEnd,
-          eventInfo.endDate,
-          eventInfo.times,
-        ]
-      );
-      return response.rows[0]["id_event_info"];
-    } catch (e) {
-      console.error(e);
-      throw new ConnectionError();
-    }
-  };
-
   addEvent = async (event: EventModel) => {
     var response;
     try {
       response = await this.client.query(
-        "INSERT INTO p.event(id_event_info, date) VALUES($1, $2) RETURNING id_event",
-        [event.eventInfo.idEventInfo, event.date]
+        "INSERT INTO p.event(date, title, init_time, end_time, all_day, description, is_task, is_collective, is_routine, init_date, frequency, interval, week_days, undefined_end, end_date, times) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id_event",
+        [
+          event.date,
+          event.title,
+          event.initTime,
+          event.endTime,
+          event.allDay,
+          event.description,
+          event.isTask,
+          event.isCollective,
+          event.isRoutine,
+          event.initDate,
+          event.frequency,
+          event.interval,
+          event.weekDays,
+          event.undefinedEnd,
+          event.endDate,
+          event.times,
+        ]
       );
       return response.rows[0]["id_event"];
     } catch (e) {
@@ -103,28 +88,28 @@ export class ScheduleDatabaseSource {
     }
   };
 
-  editEventInfo = async (eventInfo: EventInfoModel) => {
-    var response;
+  editEvent = async (event: EventModel) => {
     try {
-      response = await this.client.query(
-        "UPDATE p.event_info SET title = $1, init_time = $2, end_time = $3, all_day = $4, description = $5, is_task = $6, is_collective = $7, is_routine = $8, init_date = $9, frequency = $10, interval = $11, week_days = $12, undefined_end = $13, end_date = $14, times = $15 WHERE id_event_info = $16",
+      await this.client.query(
+        "UPDATE p.event SET date = $1, title = $2, init_time = $3, end_time = $4, all_day = $5, description = $6, is_task = $7, is_collective = $8, is_routine = $9, init_date = $10, frequency = $11, interval = $12, week_days = $13, undefined_end = $14, end_date = $15, times = $16 WHERE id_event = $17",
         [
-          eventInfo.title,
-          eventInfo.initTime,
-          eventInfo.endTime,
-          eventInfo.allDay,
-          eventInfo.description,
-          eventInfo.isTask,
-          eventInfo.isCollective,
-          eventInfo.isRoutine,
-          eventInfo.initDate,
-          eventInfo.frequency,
-          eventInfo.interval,
-          eventInfo.weekDays,
-          eventInfo.undefinedEnd,
-          eventInfo.endDate,
-          eventInfo.times,
-          eventInfo.idEventInfo,
+          event.date,
+          event.title,
+          event.initTime,
+          event.endTime,
+          event.allDay,
+          event.description,
+          event.isTask,
+          event.isCollective,
+          event.isRoutine,
+          event.initDate,
+          event.frequency,
+          event.interval,
+          event.weekDays,
+          event.undefinedEnd,
+          event.endDate,
+          event.times,
+          event.idEvent,
         ]
       );
     } catch (e) {
@@ -133,12 +118,34 @@ export class ScheduleDatabaseSource {
     }
   };
 
-  editEvent = async (event: EventModel) => {
+  deleteAssignmentsByEventId = async (idEvent: number) => {
+    try {
+      await this.client.query("DELETE FROM p.assignment WHERE id_event = $1", [
+        idEvent,
+      ]);
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  removeEvent = async (idEvent: number) => {
+    try {
+      await this.client.query("DELETE FROM p.event WHERE id_event = $1", [
+        idEvent,
+      ]);
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  addRoutineExclusion = async (idEvent: number, date: string) => {
     var response;
     try {
       response = await this.client.query(
-        "UPDATE p.event SET date = $1 WHERE id_event = $2",
-        [event.date, event.idEvent]
+        "INSERT INTO p.routine_exclusion(id_event, date) VALUES($1, $2)",
+        [idEvent, date]
       );
     } catch (e) {
       console.error(e);
@@ -146,12 +153,41 @@ export class ScheduleDatabaseSource {
     }
   };
 
-  deleteAssignmentsByEventId = async (idEvent: number) => {
+  getRoutineExclusionsByEventId = async (idEvent: number) => {
     var response;
     try {
       response = await this.client.query(
-        "DELETE FROM p.assignment WHERE id_event = $1",
+        "SELECT * FROM p.routine_exclusion WHERE id_event = $1",
         [idEvent]
+      );
+      return response.rows.map((exclusion) =>
+        RoutineExclusionModel.fromDatabase(exclusion)
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  deleteRoutineExclusionById = async (idRoutineExclusion: number) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "DELETE FROM p.routine_exclusion WHERE id_routine_exclusion = $1",
+        [idRoutineExclusion]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  resetAssignmentById = async (idAssignment: number) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "UPDATE p.assignment SET is_completed = FALSE WHERE id_assignment = $1",
+        [idAssignment]
       );
     } catch (e) {
       console.error(e);

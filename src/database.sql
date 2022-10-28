@@ -1,13 +1,13 @@
 /*AUTH*/
 
-CREATE TABLE p.person(
+CREATE TABLE IF NOT EXISTS p.person(
 	id_person SERIAL PRIMARY KEY,
 	"name" VARCHAR(45),
 	email VARCHAR(320),
 	phone VARCHAR(45)
 );
 
-CREATE TABLE p.user(
+CREATE TABLE IF NOT EXISTS p.user(
 	id_user SERIAL PRIMARY KEY,
 	id_person INT,
 	"password" VARCHAR(45),
@@ -17,7 +17,7 @@ CREATE TABLE p.user(
 			REFERENCES p.person(id_person)
 );
 
-CREATE TABLE p.session(
+CREATE TABLE IF NOT EXISTS p.session(
 	id_session SERIAL PRIMARY KEY,
 	id_user INT,
 	jwt_token VARCHAR(300),
@@ -29,7 +29,7 @@ CREATE TABLE p.session(
 
 /*EMPLOYEE*/
 
-CREATE TABLE p.employee(
+CREATE TABLE IF NOT EXISTS p.employee(
 	id_employee SERIAL PRIMARY KEY,
 	id_person INT,
 	CONSTRAINT fk_person
@@ -39,8 +39,9 @@ CREATE TABLE p.employee(
 
 /*SCHEDULE*/
 
-CREATE TABLE p.event_info(
-	id_event_info SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS p.event(
+	id_event SERIAL PRIMARY KEY,
+	"date" DATE,
 	title VARCHAR(60),
 	init_time DATE,
 	end_time DATE,
@@ -53,17 +54,9 @@ CREATE TABLE p.event_info(
 	frequency CHAR,
 	"interval" INT,
 	week_days VARCHAR(11),
+	undefined_end BOOLEAN,
 	end_date DATE,
 	times INT
-);
-
-CREATE TABLE p.event(
-	id_event SERIAL PRIMARY KEY,
-	id_event_info INT,
-	"date" DATE,
-	CONSTRAINT fk_event_info
-		FOREIGN KEY(id_event_info)
-			REFERENCES p.event_info(id_event_info)
 );
 
 CREATE TABLE IF NOT EXISTS p.assignment
@@ -74,9 +67,19 @@ CREATE TABLE IF NOT EXISTS p.assignment
     is_completed BOOLEAN,
     CONSTRAINT fk_employee
 			FOREIGN KEY (id_employee)
-        REFERENCES p.employee(id_employee)
+        REFERENCES p.employee(id_employee),
     CONSTRAINT fk_event
 			FOREIGN KEY (id_event)
         REFERENCES p.event (id_event)
-)
+);
+
+CREATE TABLE IF NOT EXISTS p.routine_exclusion
+(
+    id_routine_exclusion SERIAL PRIMARY KEY,
+    id_event INT,
+    date DATE,
+    CONSTRAINT fk_event
+			FOREIGN KEY (id_event)
+        REFERENCES p.event (id_event)
+);
 

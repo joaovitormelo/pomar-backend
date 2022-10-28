@@ -1,5 +1,5 @@
 import { ScheduleDatabaseSource } from "../../data/datasources/schedule_database_source";
-import { AssignmentModel } from "../../data/models/assignment_status_model";
+import { AssignmentModel } from "../../data/models/assignment_model";
 import { EventModel } from "../../data/models/event_model";
 
 export class EditEventParams {
@@ -27,7 +27,6 @@ export class DoEditEvent {
   }
 
   async execute(params: EditEventParams) {
-    await this.scheduleDatabaseSource.editEventInfo(params.event.eventInfo);
     await this.scheduleDatabaseSource.editEvent(params.event);
     await this.scheduleDatabaseSource.deleteAssignmentsByEventId(
       params.event.idEvent

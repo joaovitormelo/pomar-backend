@@ -30,6 +30,16 @@ export class ScheduleApi {
       new ExpressAdapter(this.scheduleRouter.editEvent).adapt
     );
 
+    router.delete(
+      "/event",
+      new ExpressAdapter(this.scheduleRouter.deleteEvent).adapt
+    );
+
+    router.get(
+      "/event/test",
+      new ExpressAdapter(this.scheduleRouter.test).adapt
+    );
+
     this.server.use("/", router);
   }
 }

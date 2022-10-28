@@ -4,9 +4,14 @@ import { HttpResponse } from "../../../../core/presentation/routers/http_respons
 import { SecuredRouter } from "../../../../core/presentation/routers/secured_router";
 import { ValidateBody } from "../../../../core/presentation/routers/validate_body";
 import { DoValidateSession } from "../../../login/domain/usecases/do_validate_session";
-import { AssignmentModel } from "../../data/models/assignment_status_model";
+import { AssignmentModel } from "../../data/models/assignment_model";
 import { EventModel } from "../../data/models/event_model";
 import { AddEventParams, DoAddEvent } from "../../domain/usecases/do_add_event";
+import { DoDailyChecks } from "../../domain/usecases/do_daily_checks";
+import {
+  DeleteEventParams,
+  DoDeleteEvent,
+} from "../../domain/usecases/do_delete_event";
 import {
   DoEditEvent,
   EditEventParams,
@@ -21,17 +26,23 @@ export class ScheduleRouter extends SecuredRouter {
   doReadEvents: DoReadEvents;
   doAddEvent: DoAddEvent;
   doEditEvent: DoEditEvent;
+  doDeleteEvent: DoDeleteEvent;
+  doDailyChecks: DoDailyChecks;
 
   constructor(
     doValidateSession: DoValidateSession,
     doReadEvents: DoReadEvents,
     doAddEvent: DoAddEvent,
-    doEditEvent: DoEditEvent
+    doEditEvent: DoEditEvent,
+    doDeleteEvent: DoDeleteEvent,
+    doDailyChecks: DoDailyChecks
   ) {
     super(doValidateSession);
     this.doReadEvents = doReadEvents;
     this.doAddEvent = doAddEvent;
     this.doEditEvent = doEditEvent;
+    this.doDeleteEvent = doDeleteEvent;
+    this.doDailyChecks = doDailyChecks;
   }
 
   readEvents = async (httpRequest: HttpRequest) => {
@@ -43,15 +54,17 @@ export class ScheduleRouter extends SecuredRouter {
         if (readEventsDataList.length > 0) {
           readEventsDataListJson = readEventsDataList.map(
             (readEventsData: ReadEventsData) => {
-              var assignmentListJson = [];
-              if (readEventsData.assignments.length > 0) {
-                assignmentListJson = readEventsData.assignments.map(
-                  (assignment) => assignment.toJSObject()
+              var assignmentListJson = readEventsData.assignments.map(
+                (assignment) => assignment.toJSObject()
+              );
+              var routineExclusionListJson =
+                readEventsData.routineExclusionList.map((routineExclusion) =>
+                  routineExclusion.toJSObject()
                 );
-              }
               return {
                 event: readEventsData.event.toJSObject(),
                 assignments: assignmentListJson,
+                routine_exclusion_list: routineExclusionListJson,
               };
             }
           );
@@ -153,5 +166,32 @@ export class ScheduleRouter extends SecuredRouter {
         }
       );
     });
+  };
+
+  deleteEvent = async (httpRequest: HttpRequest) => {
+    return await this.validateToken(httpRequest, async () => {
+      return await ValidateBody.validate(
+        httpRequest,
+        ["id_event", "exclude_dates"],
+        async () => {
+          try {
+            await this.doDeleteEvent.execute(
+              new DeleteEventParams(
+                httpRequest.body.id_event,
+                httpRequest.body.exclude_dates
+              )
+            );
+            return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
+    });
+  };
+
+  test = async (httpRequest: HttpRequest) => {
+    this.doDailyChecks.execute();
+    return new HttpResponse(200);
   };
 }

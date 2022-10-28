@@ -1,5 +1,5 @@
 import { ScheduleDatabaseSource } from "../../data/datasources/schedule_database_source";
-import { AssignmentModel } from "../../data/models/assignment_status_model";
+import { AssignmentModel } from "../../data/models/assignment_model";
 import { EventModel } from "../../data/models/event_model";
 
 export class AddEventParams {
@@ -20,10 +20,6 @@ export class DoAddEvent {
   }
 
   async execute(params: AddEventParams) {
-    const idEventInfo: number = await this.scheduleDatabaseSource.addEventInfo(
-      params.event.eventInfo
-    );
-    params.event.eventInfo.idEventInfo = idEventInfo;
     const idEvent: number = await this.scheduleDatabaseSource.addEvent(
       params.event
     );
