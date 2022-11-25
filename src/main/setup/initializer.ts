@@ -47,7 +47,7 @@ export class Initializer {
       doValidateSession,
       encrypter
     ).init();
-    //new WhatsAppInitializer(server, doValidateSession, wsServer).init();
+    new WhatsAppInitializer(server, doValidateSession, wsServer).init();
     new ScheduleInitializer(server, pgClient, doValidateSession).init();
 
     //Routes

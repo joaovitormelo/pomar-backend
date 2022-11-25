@@ -26,6 +26,9 @@ export class DoDeleteEvent {
         );
       }
     } else {
+      await this.scheduleDatabaseSource.deleteRoutineExclusionsByEventId(
+        params.idEvent
+      );
       await this.scheduleDatabaseSource.deleteAssignmentsByEventId(
         params.idEvent
       );

@@ -41,11 +41,19 @@ export class DoSendMessages {
     const returnContactList: Array<ContactModel> = [];
     for (var i in params.contactList) {
       var contact = params.contactList[i];
-      var msg = params.message.replace(nameTag, contact.name);
-      if (contact.status != SentStatus.success) {
-        console.log(contact);
-        try {
-          await this.whatsAppConnection.sendMessage(contact.phone, msg);
+
+      try {
+        var phone = contact.phone
+          .replace("(", "")
+          .replace(")", "")
+          .replace("-", "")
+          .replace(" ", "");
+        var name = contact.name.split(" ")[0].toLowerCase();
+        name = name.charAt(0).toUpperCase() + name.slice(1);
+        var msg = params.message.replace(nameTag, name);
+        if (contact.status != SentStatus.success) {
+          console.log(contact);
+          await this.whatsAppConnection.sendMessage(phone, msg);
           returnContactList.push(
             new ContactModel(
               contact.idContact,
@@ -54,19 +62,19 @@ export class DoSendMessages {
               SentStatus.success
             )
           );
-        } catch (e) {
-          console.error(e);
-          returnContactList.push(
-            new ContactModel(
-              contact.idContact,
-              contact.name,
-              contact.phone,
-              SentStatus.failed
-            )
-          );
+        } else {
+          returnContactList.push(contact);
         }
-      } else {
-        returnContactList.push(contact);
+      } catch (e) {
+        console.error(e);
+        returnContactList.push(
+          new ContactModel(
+            contact.idContact,
+            contact.name,
+            contact.phone,
+            SentStatus.failed
+          )
+        );
       }
     }
     console.log("Messages sent");

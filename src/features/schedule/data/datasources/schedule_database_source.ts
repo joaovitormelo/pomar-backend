@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import { ConnectionError, NoDataError } from "../../../../core/errors/errors";
+import { EmployeeModel } from "../../../employee/data/models/employee_model";
 import { AssignmentModel } from "../models/assignment_model";
 import { EventModel } from "../models/event_model";
 import { RoutineExclusionModel } from "../models/routine_exclusion_model";
@@ -182,12 +183,55 @@ export class ScheduleDatabaseSource {
     }
   };
 
+  deleteRoutineExclusionsByEventId = async (idEvent: number) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "DELETE FROM p.routine_exclusion WHERE id_event = $1",
+        [idEvent]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
   resetAssignmentById = async (idAssignment: number) => {
     var response;
     try {
       response = await this.client.query(
         "UPDATE p.assignment SET is_completed = FALSE WHERE id_assignment = $1",
         [idAssignment]
+      );
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  getEmployeeByPersonId = async (idPerson: number) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "SELECT * FROM p.employee WHERE id_person = $1",
+        [idPerson]
+      );
+      return EmployeeModel.fromDatabase(response.rows[0]);
+    } catch (e) {
+      console.error(e);
+      throw new ConnectionError();
+    }
+  };
+
+  switchCompleteAssignment = async (
+    idAssignment: number,
+    isCompleted: boolean
+  ) => {
+    var response;
+    try {
+      response = await this.client.query(
+        "UPDATE p.assignment SET is_completed = $1 WHERE id_assignment = $2",
+        [isCompleted, idAssignment]
       );
     } catch (e) {
       console.error(e);

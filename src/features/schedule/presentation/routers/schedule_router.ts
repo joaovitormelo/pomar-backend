@@ -20,29 +20,37 @@ import {
   DoReadEvents,
   ReadEventsData,
 } from "../../domain/usecases/do_read_events";
+import { DoReadEventsByEmployee } from "../../domain/usecases/do_read_events_by_employee";
+import { DoSwitchCompleteAssignment } from "../../domain/usecases/do_risk_task";
 
 export class ScheduleRouter extends SecuredRouter {
   doValidateSession: DoValidateSession;
   doReadEvents: DoReadEvents;
+  doReadEventsByEmployee: DoReadEventsByEmployee;
   doAddEvent: DoAddEvent;
   doEditEvent: DoEditEvent;
   doDeleteEvent: DoDeleteEvent;
   doDailyChecks: DoDailyChecks;
+  doSwitchCompleteAssignment: DoSwitchCompleteAssignment;
 
   constructor(
     doValidateSession: DoValidateSession,
     doReadEvents: DoReadEvents,
+    doReadEventsByEmployee: DoReadEventsByEmployee,
     doAddEvent: DoAddEvent,
     doEditEvent: DoEditEvent,
     doDeleteEvent: DoDeleteEvent,
-    doDailyChecks: DoDailyChecks
+    doDailyChecks: DoDailyChecks,
+    doSwitchCompleteAssignment: DoSwitchCompleteAssignment
   ) {
     super(doValidateSession);
     this.doReadEvents = doReadEvents;
+    this.doReadEventsByEmployee = doReadEventsByEmployee;
     this.doAddEvent = doAddEvent;
     this.doEditEvent = doEditEvent;
     this.doDeleteEvent = doDeleteEvent;
     this.doDailyChecks = doDailyChecks;
+    this.doSwitchCompleteAssignment = doSwitchCompleteAssignment;
   }
 
   readEvents = async (httpRequest: HttpRequest) => {
@@ -73,6 +81,45 @@ export class ScheduleRouter extends SecuredRouter {
       } catch (e) {
         return ErrorMessages.mapErrorToHttpResponse(e);
       }
+    });
+  };
+
+  readEventsByEmployee = async (httpRequest: HttpRequest) => {
+    return await this.validateToken(httpRequest, async () => {
+      return await ValidateBody.validate(
+        httpRequest,
+        ["id_person"],
+        async () => {
+          try {
+            const readEventsDataList: Array<ReadEventsData> =
+              await this.doReadEventsByEmployee.execute(
+                httpRequest.body.id_person
+              );
+            var readEventsDataListJson = [];
+            if (readEventsDataList.length > 0) {
+              readEventsDataListJson = readEventsDataList.map(
+                (readEventsData: ReadEventsData) => {
+                  var assignmentListJson = readEventsData.assignments.map(
+                    (assignment) => assignment.toJSObject()
+                  );
+                  var routineExclusionListJson =
+                    readEventsData.routineExclusionList.map(
+                      (routineExclusion) => routineExclusion.toJSObject()
+                    );
+                  return {
+                    event: readEventsData.event.toJSObject(),
+                    assignments: assignmentListJson,
+                    routine_exclusion_list: routineExclusionListJson,
+                  };
+                }
+              );
+            }
+            return new HttpResponse(200, readEventsDataListJson);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
     });
   };
 
@@ -180,6 +227,26 @@ export class ScheduleRouter extends SecuredRouter {
                 httpRequest.body.id_event,
                 httpRequest.body.exclude_dates
               )
+            );
+            return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
+    });
+  };
+
+  switchCompleteAssignment = async (httpRequest: HttpRequest) => {
+    return await this.validateToken(httpRequest, async () => {
+      return await ValidateBody.validate(
+        httpRequest,
+        ["id_assignment", "is_completed"],
+        async () => {
+          try {
+            await this.doSwitchCompleteAssignment.execute(
+              httpRequest.body["id_assignment"],
+              httpRequest.body["is_completed"]
             );
             return new HttpResponse(200);
           } catch (e) {

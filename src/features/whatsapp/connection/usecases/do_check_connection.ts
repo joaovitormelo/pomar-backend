@@ -43,6 +43,7 @@ export class DoCheckConnection {
         } else if (state == WAState.CONNECTED) {
           return new CheckConnectionReturn(false, "", "");
         } else {
+          console.log("Falha!");
           return new CheckConnectionReturn(
             true,
             "Falha na conexão com o WhatsApp!",
@@ -51,6 +52,7 @@ export class DoCheckConnection {
         }
       }
     } catch (e) {
+      console.log(e);
       return new CheckConnectionReturn(
         true,
         "Aguarde a conexão com o WhatsApp...",

@@ -21,6 +21,11 @@ export class ScheduleApi {
     );
 
     router.post(
+      "/events/employee",
+      new ExpressAdapter(this.scheduleRouter.readEventsByEmployee).adapt
+    );
+
+    router.post(
       "/event",
       new ExpressAdapter(this.scheduleRouter.addEvent).adapt
     );
@@ -33,6 +38,11 @@ export class ScheduleApi {
     router.delete(
       "/event",
       new ExpressAdapter(this.scheduleRouter.deleteEvent).adapt
+    );
+
+    router.post(
+      "/event/complete",
+      new ExpressAdapter(this.scheduleRouter.switchCompleteAssignment).adapt
     );
 
     router.get(
