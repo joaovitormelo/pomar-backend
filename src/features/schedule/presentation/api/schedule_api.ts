@@ -45,6 +45,11 @@ export class ScheduleApi {
       new ExpressAdapter(this.scheduleRouter.switchCompleteAssignment).adapt
     );
 
+    router.post(
+      "/tasks/employee",
+      new ExpressAdapter(this.scheduleRouter.readTasksByEmployee).adapt
+    );
+
     router.get(
       "/event/test",
       new ExpressAdapter(this.scheduleRouter.test).adapt

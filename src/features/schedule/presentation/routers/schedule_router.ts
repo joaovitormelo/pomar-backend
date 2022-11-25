@@ -21,6 +21,7 @@ import {
   ReadEventsData,
 } from "../../domain/usecases/do_read_events";
 import { DoReadEventsByEmployee } from "../../domain/usecases/do_read_events_by_employee";
+import { DoReadTasksByEmployee } from "../../domain/usecases/do_read_tasks_by_employee";
 import { DoSwitchCompleteAssignment } from "../../domain/usecases/do_risk_task";
 
 export class ScheduleRouter extends SecuredRouter {
@@ -32,6 +33,7 @@ export class ScheduleRouter extends SecuredRouter {
   doDeleteEvent: DoDeleteEvent;
   doDailyChecks: DoDailyChecks;
   doSwitchCompleteAssignment: DoSwitchCompleteAssignment;
+  doReadTasksByEmployee: DoReadTasksByEmployee;
 
   constructor(
     doValidateSession: DoValidateSession,
@@ -41,7 +43,8 @@ export class ScheduleRouter extends SecuredRouter {
     doEditEvent: DoEditEvent,
     doDeleteEvent: DoDeleteEvent,
     doDailyChecks: DoDailyChecks,
-    doSwitchCompleteAssignment: DoSwitchCompleteAssignment
+    doSwitchCompleteAssignment: DoSwitchCompleteAssignment,
+    doReadTasksByEmployee: DoReadTasksByEmployee
   ) {
     super(doValidateSession);
     this.doReadEvents = doReadEvents;
@@ -51,6 +54,7 @@ export class ScheduleRouter extends SecuredRouter {
     this.doDeleteEvent = doDeleteEvent;
     this.doDailyChecks = doDailyChecks;
     this.doSwitchCompleteAssignment = doSwitchCompleteAssignment;
+    this.doReadTasksByEmployee = doReadTasksByEmployee;
   }
 
   readEvents = async (httpRequest: HttpRequest) => {
@@ -249,6 +253,45 @@ export class ScheduleRouter extends SecuredRouter {
               httpRequest.body["is_completed"]
             );
             return new HttpResponse(200);
+          } catch (e) {
+            return ErrorMessages.mapErrorToHttpResponse(e);
+          }
+        }
+      );
+    });
+  };
+
+  readTasksByEmployee = async (httpRequest: HttpRequest) => {
+    return await this.validateToken(httpRequest, async () => {
+      return await ValidateBody.validate(
+        httpRequest,
+        ["id_person"],
+        async () => {
+          try {
+            const readEventsDataList: Array<ReadEventsData> =
+              await this.doReadTasksByEmployee.execute(
+                httpRequest.body.id_person
+              );
+            var readEventsDataListJson = [];
+            if (readEventsDataList.length > 0) {
+              readEventsDataListJson = readEventsDataList.map(
+                (readEventsData: ReadEventsData) => {
+                  var assignmentListJson = readEventsData.assignments.map(
+                    (assignment) => assignment.toJSObject()
+                  );
+                  var routineExclusionListJson =
+                    readEventsData.routineExclusionList.map(
+                      (routineExclusion) => routineExclusion.toJSObject()
+                    );
+                  return {
+                    event: readEventsData.event.toJSObject(),
+                    assignments: assignmentListJson,
+                    routine_exclusion_list: routineExclusionListJson,
+                  };
+                }
+              );
+            }
+            return new HttpResponse(200, readEventsDataListJson);
           } catch (e) {
             return ErrorMessages.mapErrorToHttpResponse(e);
           }

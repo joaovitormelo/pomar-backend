@@ -7,6 +7,7 @@ import { DoDeleteEvent } from "./domain/usecases/do_delete_event";
 import { DoEditEvent } from "./domain/usecases/do_edit_event";
 import { DoReadEvents } from "./domain/usecases/do_read_events";
 import { DoReadEventsByEmployee } from "./domain/usecases/do_read_events_by_employee";
+import { DoReadTasksByEmployee } from "./domain/usecases/do_read_tasks_by_employee";
 import { DoSwitchCompleteAssignment } from "./domain/usecases/do_risk_task";
 import { ScheduleApi } from "./presentation/api/schedule_api";
 import { ScheduleRouter } from "./presentation/routers/schedule_router";
@@ -39,6 +40,8 @@ export class ScheduleInitializer {
     );
     const doSwitchCompleteAssignment: DoSwitchCompleteAssignment =
       new DoSwitchCompleteAssignment(scheduleDatabaseSource);
+    const doReadTasksByEmployee: DoReadTasksByEmployee =
+      new DoReadTasksByEmployee(doReadEventsByEmployee);
 
     const scheduleRouter: ScheduleRouter = new ScheduleRouter(
       this.doValidateSession,
@@ -48,7 +51,8 @@ export class ScheduleInitializer {
       doEditEvent,
       doDelete,
       doDailyChecks,
-      doSwitchCompleteAssignment
+      doSwitchCompleteAssignment,
+      doReadTasksByEmployee
     );
 
     new ScheduleApi(this.server, scheduleRouter).start();
