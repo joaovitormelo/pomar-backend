@@ -1,10 +1,6 @@
-import {
-  AuthenticationError,
-  InvalidValueError,
-} from "../../../../core/errors/errors";
+import { AuthenticationError } from "../../../../core/errors/errors";
 import { EncrypterContract } from "../../../../core/utils/encrypter";
-import { ValidatorContract } from "../../../../core/utils/validator";
-import { TimerContract } from "../../utils/timer";
+import { TimerContract } from "../../../../core/utils/timer";
 import {
   TokenGeneratorContract,
   TokenGeneratorParams,

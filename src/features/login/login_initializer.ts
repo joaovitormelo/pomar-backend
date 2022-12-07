@@ -8,7 +8,7 @@ import { DoValidateSession } from "./domain/usecases/do_validate_session";
 import { Logout } from "./domain/usecases/logout";
 import { LoginApi } from "./presentation/api/login_api";
 import { LoginRouter } from "./presentation/routers/login_router";
-import Timer from "./utils/timer";
+import Timer from "../../core/utils/timer";
 import { TokenGenerator } from "./utils/token_generator";
 
 export class LoginInitializer {
